@@ -146,5 +146,14 @@ namespace Utilikit {
         public static Ray GetRay( this Transform transform ) {
             return new Ray( transform.position, transform.forward );
         }
+
+        #region RectTransform
+        public static void FillParent( this RectTransform transform ) {
+            transform.anchorMin = Vector2.zero;
+            transform.anchorMax = Vector2.one;
+            transform.offsetMin = Vector2.zero;
+            transform.offsetMax = Vector2.zero;
+        }
+        #endregion
     }
 }
