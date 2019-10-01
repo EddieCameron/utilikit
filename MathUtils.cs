@@ -27,5 +27,17 @@ namespace Utilikit
             return rect;
         }
 #endregion
+
+#region  Geometry
+        /// <summary>
+        /// Return the length of a vector as projected along a given direction
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="distance"></param>
+        /// <returns></returns>
+        public static float ProjectedLength( this Vector2 a, Vector2 dir ) {
+            return Vector2.Dot( a, dir.normalized );
+        }
+#endregion
     }
 }
