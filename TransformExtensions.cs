@@ -154,6 +154,17 @@ namespace Utilikit {
             transform.offsetMin = Vector2.zero;
             transform.offsetMax = Vector2.zero;
         }
+
+        static Vector3[] _worldRectCache;
+        public static Rect GetWorldRect( this RectTransform t ) {
+            if ( _worldRectCache == null )
+                _worldRectCache = new Vector3[4];
+
+            t.GetWorldCorners( _worldRectCache );
+            Vector2 min = _worldRectCache[0];
+            Vector2 max = _worldRectCache[2];
+            return new Rect( min, max - min );
+        }
         #endregion
     }
 }
