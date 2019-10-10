@@ -20,7 +20,27 @@ public static class Inventory {
         return 0;
     }
 
-    public static bool TryUseItems( string itemId, int quantity, out int remainingQuantity ) {
+    public static void AddItems( string itemId, int quantity = 1 ) {
+        if ( quantity <= 0 )
+            throw new ArgumentException( "Invalid number of items to add" );
+
+        if ( _inventoryQuantities.TryGetValue( itemId, out int existingAmount ) ) {
+            existingAmount += quantity;
+            _inventoryQuantities[itemId] = existingAmount;
+        }
+        else {
+            _inventoryQuantities[itemId] = quantity;
+        }
+    }
+
+    public static bool TryTakeItems( string itemId, int quantity ) {
+        return TryTakeItems( itemId, quantity, out int _ );
+    }
+
+    public static bool TryTakeItems( string itemId, int quantity, out int remainingQuantity ) {
+        if ( quantity <= 0 )
+            throw new ArgumentException( "Invalid number of items to use" );
+
         remainingQuantity = GetQuantity( itemId );
         if ( remainingQuantity < quantity ) {
             return false;
