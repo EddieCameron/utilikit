@@ -1,0 +1,14 @@
+{
+    "name": "com.eddiecameron.utilikit",
+    "version": "2.0.0",
+    "displayName": "Utilikit",
+    "description": "It's the utilities",
+   "keywords": [
+       "Boring things"
+    ],
+    "author": {
+      "name": "Eddie Cameron",
+      "email": "eddie@eddiecameron.fun",
+      "url": "https://eddiecameron.fun"
+    }
+  }
