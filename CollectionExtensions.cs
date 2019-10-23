@@ -41,5 +41,18 @@ namespace Utilikit
             collection.Add( element );
             return true;
         }
+
+        /// <summary>
+        /// Get a random element from a non-empty list/array
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static T RandomElement<T>( this IList<T> collection ) {
+            if ( collection.Count == 0 )
+                throw new ArgumentException( "Can't get random element from empty collection" );
+
+            return collection[UnityEngine.Random.Range( 0, collection.Count )];
+        }
     }
 }
