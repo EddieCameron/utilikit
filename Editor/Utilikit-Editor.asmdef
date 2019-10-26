@@ -1,0 +1,14 @@
+{
+    "name": "Utilikit-Editor",
+    "references": [
+        "GUID:c6f395b285d95a54689049cdcc3caf31"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": []
+}
