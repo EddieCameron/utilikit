@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
 using UnityEngine.UI;
+using System;
 
 namespace Utilikit {
     /// <summary>
@@ -45,19 +46,14 @@ namespace Utilikit {
             // make home screen
             var homeScreen = GetScreen( "" );
 
-#if UNITY_EDITOR
-            Assembly editorAssembly = System.AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault( a => a.FullName.StartsWith( "Assembly-CSharp-Editor," ) ); // ',' included to ignore  Assembly-CSharp-Editor-FirstPass
-#endif
+            Assembly[] allAssemblies = System.AppDomain.CurrentDomain.GetAssemblies();
+            IEnumerable<Type> allTypes = allAssemblies.SelectMany( a => a.GetTypes() );
+
+            IEnumerable<MethodInfo> staticMethods = allTypes.SelectMany( t => t.GetMethods( BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic ) );   // all static methods
+            IEnumerable<PropertyInfo> staticProps = allTypes.SelectMany( t => t.GetProperties( BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic ) );   // all static methods
 
             // populate buttons
-            var consoleMethods = GetMethodsWithAttributeFromAssembly<DevConsoleButtonAttribute>( Assembly.GetExecutingAssembly() ).ToArray();
-
-#if UNITY_EDITOR
-            if ( editorAssembly != null ) {
-                // get editor methods too
-                consoleMethods.Concat( GetMethodsWithAttributeFromAssembly<DevConsoleButtonAttribute>( editorAssembly ) );
-            }
-#endif
+            var consoleMethods = GetMethodsWithAttribute<DevConsoleButtonAttribute>( staticMethods ).ToArray();
 
             for ( int i = 0; i < consoleMethods.Length; i++ ) {
                 var methodAttrs = consoleMethods[i];
@@ -66,13 +62,7 @@ namespace Utilikit {
             }
 
             // populate sliders
-            var sliderProperties = GetPropertiesWithAttributeFromAssembly<DevConsoleSliderAttribute>( Assembly.GetExecutingAssembly() ).ToArray();
-#if UNITY_EDITOR
-            if ( editorAssembly != null ) {
-                // get editor fields too
-                sliderProperties.Concat( GetPropertiesWithAttributeFromAssembly<DevConsoleSliderAttribute>( editorAssembly ) );
-            }
-#endif
+            var sliderProperties = GetPropertiesWithAttribute<DevConsoleSliderAttribute>( staticProps ).ToArray();
             for ( int i = 0; i < sliderProperties.Length; i++ ) {
                 var sliderAttr = sliderProperties[i];
                 var slider = CreateDevConsoleItem( devConsoleSliderPrefab, sliderAttr.attribute );
@@ -80,17 +70,15 @@ namespace Utilikit {
             }
         }
 
-        private IEnumerable<(MethodInfo method, TAttributeType attribute)> GetMethodsWithAttributeFromAssembly<TAttributeType>( Assembly assembly ) where TAttributeType : DevConsoleAttribute {
-            return assembly.GetTypes()
-                .SelectMany( t => t.GetMethods( BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic ) )   // all static methods
+        private IEnumerable<(MethodInfo method, TAttributeType attribute)> GetMethodsWithAttribute<TAttributeType>( IEnumerable<MethodInfo> methods ) where TAttributeType : DevConsoleAttribute {
+            return methods
                 .Select( method => (method, attributes: method.GetCustomAttributes<TAttributeType>( false )) )      // all attributes
                 .Where( pa => pa.attributes.Count() > 0 )                                                                        // throw out the non-testing console things
                 .Select( pa => (pa.method, pa.attributes.First()) );
         }
 
-        private IEnumerable<(PropertyInfo property, TAttributeType attribute)> GetPropertiesWithAttributeFromAssembly<TAttributeType>( Assembly assembly ) where TAttributeType : DevConsoleAttribute {
-            return assembly.GetTypes()
-                .SelectMany( t => t.GetProperties( BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic ) )   // all static properties
+        private IEnumerable<(PropertyInfo property, TAttributeType attribute)> GetPropertiesWithAttribute<TAttributeType>( IEnumerable<PropertyInfo> properties ) where TAttributeType : DevConsoleAttribute {
+            return properties
                 .Select( property => (property, attributes: property.GetCustomAttributes<TAttributeType>( false )) )      // all attributes
                 .Where( pa => pa.attributes.Count() > 0 )                                                                        // throw out the non-testing console things
                 .Select( pa => (pa.property, pa.attributes.First()) );
