@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Utilikit {
     public class DevConsoleTrigger : MonoBehaviour {
-#if DEVELOPMENT_BUILD || UNITY_EDITOR
+#if DEVELOPMENT_BUILD
         float lastTap, nextLastTap;
 
         const float TRIPLE_TAP_TIME = 0.4f;
