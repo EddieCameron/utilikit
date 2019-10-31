@@ -40,13 +40,13 @@ namespace Utilikit {
 
         protected virtual void Awake() {
             if ( _instance && _instance != this ) {
-                Debug.LogError( "Multiple singleton instances of type " + typeof( T ) );
+                Debug.LogWarning( "Multiple singleton instances of type " + typeof( T ) );
                 Destroy( this );
             }
             _instance = Instance;
         }
 
-        void OnApplicationQuit() {
+        protected virtual void OnApplicationQuit() {
             applicationIsQuitting = true;
         }
     }

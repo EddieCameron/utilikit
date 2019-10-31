@@ -5,13 +5,8 @@ using UnityEngine;
 public static class Inventory {
     static Dictionary<string, int> _inventoryQuantities = new Dictionary<string, int>();
 
-
     static Inventory() {
-        // Pre-fill inventory
-        foreach ( var quantity in InventoryConfig.Instance.initialQuantities ) {
-            _inventoryQuantities[quantity.itemId] = quantity.quantity;
-        }
-        // TODO load from prefs
+        RestoreDefaultContents();
     }
 
     public static int GetQuantity( string itemId ) {
@@ -51,9 +46,42 @@ public static class Inventory {
         return true;
     }
 
+    public static void RestoreDefaultContents() {
+        // Pre-fill inventory
+        _inventoryQuantities.Clear();
+        foreach ( var quantity in InventoryConfig.Instance.initialQuantities ) {
+            _inventoryQuantities[quantity.itemId] = quantity.quantity;
+        }
+    }
+
+    public static void RestoreFromRecord( Record record ) {
+        _inventoryQuantities.Clear();
+        foreach ( var item in record.inventoryContents ) {
+            _inventoryQuantities[item.itemId] = item.quantity;
+        }
+    }
+
+    public static Record GetRecord() {
+        return new Record( _inventoryQuantities );
+    }
+
     [Serializable]
     public struct Quantity {
         public string itemId;
         public int quantity;
+    }
+    
+    [Serializable]
+    public class Record {
+        public Quantity[] inventoryContents;
+
+        public Record( IDictionary<string, int> inventoryDict ) {
+            inventoryContents = new Quantity[inventoryDict.Count];
+            int i = 0;
+            foreach ( var item in inventoryDict ) {
+                inventoryContents[i] = new Quantity { itemId = item.Key, quantity = item.Value };
+                i++;
+            }
+        }
     }
 }
