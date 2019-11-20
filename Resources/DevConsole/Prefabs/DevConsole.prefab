@@ -194,6 +194,8 @@ MonoBehaviour:
     type: 3}
   devConsoleSliderPrefab: {fileID: 5447277585920954230, guid: 02a691d6a02ed46cabbea1c3fbf555e5,
     type: 3}
+  devConsoleTogglePrefab: {fileID: 232921228348862857, guid: db2db14850aec4d85a8c6d056c707e34,
+    type: 3}
 --- !u!1 &7945214887513783696
 GameObject:
   m_ObjectHideFlags: 0

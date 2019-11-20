@@ -23,6 +23,11 @@ namespace Utilikit {
     }
 
     [AttributeUsage( AttributeTargets.Property )]
+    public class DevConsoleToggleAttribute : DevConsoleAttribute {
+        public DevConsoleToggleAttribute( string displayName, string screen = "" ) : base( displayName, screen ) { }
+    }
+
+    [AttributeUsage( AttributeTargets.Property )]
     public class DevConsoleSliderAttribute : DevConsoleAttribute {
         public float min, max;
         public DevConsoleSliderAttribute( string displayName, float min, float max, string screen = "" ) : base( displayName, screen ) {
