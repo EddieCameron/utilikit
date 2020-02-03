@@ -7,7 +7,11 @@ namespace Utilikit {
         static object _lock = new object();
         static bool applicationIsQuitting;
 
-        static List<T> _sceneInstances = new List<T>( 1 );
+        // for domain reloading
+        [RuntimeInitializeOnLoadMethod( RuntimeInitializeLoadType.SubsystemRegistration )]
+        static void Initialize() {
+            applicationIsQuitting = false;
+        }
 
         private static T _instance;
         public static T Instance {
