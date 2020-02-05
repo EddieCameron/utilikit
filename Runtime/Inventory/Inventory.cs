@@ -5,8 +5,12 @@ using UnityEngine;
 public static class Inventory {
     static Dictionary<string, int> _inventoryQuantities = new Dictionary<string, int>();
 
-    [RuntimeInitializeOnLoadMethod( RuntimeInitializeLoadType.SubsystemRegistration )]
-    private static void Initialize() {
+
+    static Inventory() {
+        RestoreDefaultContents();
+    }
+    
+    private static void OnApplicationQuit() {
         RestoreDefaultContents();
     }
 

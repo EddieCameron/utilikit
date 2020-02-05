@@ -7,11 +7,13 @@ namespace Utilikit {
         static object _lock = new object();
         static bool applicationIsQuitting;
 
+#if UNITY_EDITOR
         // for domain reloading
-        [RuntimeInitializeOnLoadMethod( RuntimeInitializeLoadType.SubsystemRegistration )]
+        [RuntimeInitializeOnLoadMethod( RuntimeInitializeLoadType.BeforeSceneLoad )]
         static void Initialize() {
             applicationIsQuitting = false;
         }
+#endif
 
         private static T _instance;
         public static T Instance {
