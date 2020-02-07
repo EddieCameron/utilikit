@@ -2,18 +2,24 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Utilikit {
-    public class StaticBehaviour<T> : MonoBehaviour where T : MonoBehaviour {
+    public abstract class StaticBehaviour : MonoBehaviour {
 
-        static object _lock = new object();
-        static bool applicationIsQuitting;
+        protected static bool applicationIsQuitting;
 
-#if UNITY_EDITOR
         // for domain reloading
-        [RuntimeInitializeOnLoadMethod( RuntimeInitializeLoadType.BeforeSceneLoad )]
+        [RuntimeInitializeOnLoadMethod( RuntimeInitializeLoadType.SubsystemRegistration )]
         static void Initialize() {
             applicationIsQuitting = false;
         }
-#endif
+
+        protected virtual void OnApplicationQuit() {
+            applicationIsQuitting = true;
+        }
+    }
+
+    public class StaticBehaviour<T> : StaticBehaviour where T : MonoBehaviour {
+
+        static object _lock = new object();
 
         private static T _instance;
         public static T Instance {
@@ -50,10 +56,6 @@ namespace Utilikit {
                 Destroy( this );
             }
             _instance = Instance;
-        }
-
-        protected virtual void OnApplicationQuit() {
-            applicationIsQuitting = true;
         }
     }
 }
