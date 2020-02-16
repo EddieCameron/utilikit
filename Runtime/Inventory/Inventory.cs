@@ -5,12 +5,17 @@ using UnityEngine;
 public static class Inventory {
     static Dictionary<string, int> _inventoryQuantities = new Dictionary<string, int>();
 
+    #if UNITY_EDITOR
+    // for domain reloading
+    [RuntimeInitializeOnLoadMethod( RuntimeInitializeLoadType.SubsystemRegistration )]
+    static void Initialize() {
+        // only restore if there are things in the inventory
+        if ( _inventoryQuantities.Count > 0 )
+            RestoreDefaultContents();
+    }
+    #endif
 
     static Inventory() {
-        RestoreDefaultContents();
-    }
-    
-    private static void OnApplicationQuit() {
         RestoreDefaultContents();
     }
 
@@ -75,7 +80,7 @@ public static class Inventory {
         public string itemId;
         public int quantity;
     }
-    
+
     [Serializable]
     public class Record {
         public Quantity[] inventoryContents;
