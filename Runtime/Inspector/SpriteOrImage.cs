@@ -27,6 +27,12 @@ namespace Utilikit {
         public bool HasReference => _spriteRenderer != null || _image != null;
         public Component ReferencedComponent => IsSpriteRenderer ? (Component)_spriteRenderer : (Component)_image;
 
+        public void GetFromGameObject( GameObject go ) {
+            _spriteRenderer = go.GetComponent<SpriteRenderer>();
+            if ( _spriteRenderer == null )
+                _image = go.GetComponent<Image>();
+        }
+
         public bool Enabled {
             get {
                 if ( IsSpriteRenderer )
