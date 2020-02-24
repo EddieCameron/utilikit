@@ -86,7 +86,7 @@ public class GameObjectPool {
     /// </summary>
     /// <param name="pooledObject"></param>
     public void Despawn( PooledObject pooledObject ) {
-        bool wasSpawned = _pooledObjects.Remove( pooledObject );
+        bool wasSpawned = _spawnedObjects.Remove( pooledObject );
         if ( !wasSpawned ) {
             throw new ArgumentException( "Tried to despawn an object that didn't come from this pool" );
         }
@@ -109,6 +109,25 @@ public class GameObjectPool {
         }
 
         Despawn( pooledObject );
+    }
+
+    List<PooledObject> _spawnedObjectTempCache;
+
+    /// <summary>
+    /// Return all spawned game objects to the pool
+    /// </summary>
+    public void DespawnAll() {
+        // make temp cache in case spawned objects are modified during despawn
+        if ( _spawnedObjectTempCache == null )
+            _spawnedObjectTempCache = new List<PooledObject>( _spawnedObjects.Count );
+        else
+            _spawnedObjectTempCache.Clear();
+
+        foreach ( var obj in _spawnedObjects )
+            _spawnedObjectTempCache.Add( obj );
+
+        foreach ( var obj in _spawnedObjectTempCache )
+            obj.DespawnToPool();
     }
 
     /// <summary>

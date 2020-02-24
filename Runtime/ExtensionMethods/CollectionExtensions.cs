@@ -54,5 +54,26 @@ namespace Utilikit
 
             return collection[UnityEngine.Random.Range( 0, collection.Count )];
         }
+
+        /// <summary>
+        /// Find the element in the collection that returns the highest value when evaluated with the evaluateFunction
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <param name="evaluateFunction"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static T FindHighest<T>( this IEnumerable<T> collection, Func<T, float> evaluateFunction ) {
+            T currentHighest = default( T );
+            float currentHighestValue = float.MinValue;
+            foreach (var item in collection)
+            {
+                float itemEvaluatedValue = evaluateFunction( item );
+                if ( itemEvaluatedValue > currentHighestValue ) {
+                    currentHighest = item;
+                    currentHighestValue = itemEvaluatedValue;
+                }
+            }
+            return currentHighest;
+        }
     }
 }
