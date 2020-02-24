@@ -13,6 +13,7 @@ public class GameObjectPool {
     public readonly GameObject SourceObject;
 
     HashSet<PooledObject> _spawnedObjects;
+    public IReadOnlyCollection<PooledObject> SpawnedObjects => _spawnedObjects;
 
     Transform _despawnedObjectContainer;
     LinkedList<PooledObject> _pooledObjects;
