@@ -40,10 +40,11 @@ namespace Utilikit {
 
         public void GetInventoryContents( List<Quantity> listToFill ) {
             foreach ( var item in _inventoryQuantities ) {
-                if ( item.Value > 0 )
-                    listToFill.Add( new Quantity { itemId = item.Key, quantity = item.Value } );
+                listToFill.Add( new Quantity { itemId = item.Key, quantity = item.Value } );
             }
         }
+
+        public int NumInventoryItemTypes => _inventoryQuantities.Count;
 
         public void AddItems( string itemId, int quantity = 1 ) {
             if ( quantity <= 0 )
@@ -72,7 +73,12 @@ namespace Utilikit {
             }
 
             remainingQuantity -= quantity;
-            _inventoryQuantities[itemId] = remainingQuantity;
+            if ( remainingQuantity == 0 ) {
+                _inventoryQuantities.Remove( itemId );
+            }
+            else {
+                _inventoryQuantities[itemId] = remainingQuantity;
+            }
             return true;
         }
 

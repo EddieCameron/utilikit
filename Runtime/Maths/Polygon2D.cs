@@ -7,7 +7,7 @@ using Utilikit;
 using Random = UnityEngine.Random;
 
 namespace Utilikit {
-    public struct Polygon2D {
+    public class Polygon2D {
         Vector2[] vertices;
 
         public readonly int NumVertices;
@@ -113,6 +113,23 @@ namespace Utilikit {
         float IsLeft( Vector2 p0, Vector2 p1, Vector2 pTest ) {
             return ( ( p1.x - p0.x ) * ( pTest.y - p0.y )
                     - ( pTest.x - p0.x ) * ( p1.y - p0.y ) );
+        }
+
+        /// <summary>
+        /// Test whether the given line segment intersects with any of the polygon edges
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public bool DoesIntersectWithLine( Vector2 a, Vector2 b ) {
+            for ( int i = 0; i < NumVertices; i++ ) {
+                var e0 = vertices[i];
+                var e1 = vertices[( i + 1 ) % NumVertices];   // TODO precalc edges?
+                if ( MathUtils.TestLineIntersection( a, b, e0, e1 ) )
+                    return true;
+            }
+
+            return false;
         }
     }
 }
