@@ -1,11 +1,12 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Utilikit {
     public class Inventory {
 
-#region Global inventory
+        #region Global inventory
         static Inventory _global;
         public static Inventory Global {
             get {
@@ -23,7 +24,7 @@ namespace Utilikit {
             _global = null;
         }
 #endif
-#endregion
+        #endregion
 
         Dictionary<string, int> _inventoryQuantities = new Dictionary<string, int>();
 
@@ -38,13 +39,12 @@ namespace Utilikit {
             return 0;
         }
 
-        public void GetInventoryContents( List<Quantity> listToFill ) {
-            foreach ( var item in _inventoryQuantities ) {
-                listToFill.Add( new Quantity { itemId = item.Key, quantity = item.Value } );
+        public IEnumerable<Quantity> AllItems {
+            get {
+                foreach ( var item in _inventoryQuantities )
+                    yield return new Quantity( item.Key, item.Value );
             }
         }
-
-        public int NumInventoryItemTypes => _inventoryQuantities.Count;
 
         public void AddItems( string itemId, int quantity = 1 ) {
             if ( quantity <= 0 )
@@ -105,6 +105,11 @@ namespace Utilikit {
         public struct Quantity {
             public string itemId;
             public int quantity;
+
+            public Quantity( string itemId, int quantity ) {
+                this.itemId = itemId;
+                this.quantity = quantity;
+            }
         }
 
         [Serializable]
@@ -115,7 +120,7 @@ namespace Utilikit {
                 inventoryContents = new Quantity[inventoryDict.Count];
                 int i = 0;
                 foreach ( var item in inventoryDict ) {
-                    inventoryContents[i] = new Quantity { itemId = item.Key, quantity = item.Value };
+                    inventoryContents[i] = new Quantity( item.Key, item.Value );
                     i++;
                 }
             }
