@@ -116,6 +116,46 @@ namespace Utilikit {
 
             return false; // Doesn't fall in any of the above cases
         }
+
+
+        /// <summary>
+        /// What is the shortest distance from a point on the given line to pTest
+        /// </summary>
+        /// <returns></returns>
+        public static float DistanceFromPointToLine( Vector2 p0, Vector2 p1, Vector2 pTest ) {
+            // https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
+            // Return minimum distance between line segment vw and point p
+            float l2 = ( p1 - p0 ).sqrMagnitude;  // i.e. |w-v|^2 -  avoid a sqrt
+            if ( l2 == 0.0 ) return ( pTest - p0 ).magnitude;   // v == w case
+
+            // Consider the line extending the segment, parameterized as v + t (w - v).
+            // We find projection of point p onto the line. 
+            // It falls where t = [(p-v) . (w-v)] / |w-v|^2
+            // We clamp t from [0,1] to handle points outside the segment vw.
+            float t = Mathf.Max( 0, Mathf.Min( 1, Vector2.Dot( pTest - p0, p1 - p0 ) / l2 ) );
+            Vector2 projection = p0 + t * ( p1 - p0 );  // Projection falls on the segment
+            return ( pTest - projection ).magnitude;
+        }
+
+
+        /// <summary>
+        /// Get the closest point on line p0-p1 to pTest
+        /// </summary>
+        /// <returns></returns>
+        public static Vector2 NearestPointOnLine( Vector2 p0, Vector2 p1, Vector2 pTest ) {
+            Vector2 startToPoint = pTest - p0;
+            Vector2 startToEnd = ( p1 - p0 ).normalized;
+            float dot = Vector2.Dot( startToEnd, startToPoint );
+
+            if ( dot <= 0 )
+                return p0;
+
+            if ( dot >= Vector2.Distance( p0, p1 ) )
+                return p1;
+
+            Vector2 offsetToPoint = startToEnd * dot;
+            return p0 + offsetToPoint;
+        }
         #endregion
     }
 }
