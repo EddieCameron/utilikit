@@ -17,6 +17,10 @@ namespace Utilikit {
             }
         }
 
+        public delegate void InventoryChangedEvent( string modifiedItemId, int newItemQuantity, int change );
+        public event InventoryChangedEvent ItemAdded;
+        public event InventoryChangedEvent ItemRemoved;
+
 #if UNITY_EDITOR
         // for domain reloading
         [RuntimeInitializeOnLoadMethod( RuntimeInitializeLoadType.SubsystemRegistration )]
@@ -53,9 +57,11 @@ namespace Utilikit {
             if ( _inventoryQuantities.TryGetValue( itemId, out int existingAmount ) ) {
                 existingAmount += quantity;
                 _inventoryQuantities[itemId] = existingAmount;
+                ItemAdded?.Invoke( itemId, existingAmount, quantity );
             }
             else {
                 _inventoryQuantities[itemId] = quantity;
+                ItemAdded?.Invoke( itemId, quantity, quantity );
             }
         }
 
@@ -79,6 +85,8 @@ namespace Utilikit {
             else {
                 _inventoryQuantities[itemId] = remainingQuantity;
             }
+            ItemRemoved?.Invoke( itemId, remainingQuantity, -quantity );
+
             return true;
         }
 
