@@ -157,5 +157,21 @@ namespace Utilikit {
             return p0 + offsetToPoint;
         }
         #endregion
+
+        #region Maths
+        /// <summary>
+        /// Ping pongs t between 0 and length(inclusive)
+        /// </summary>
+        /// <param name="t"></param>
+        /// <param name="length"></param>
+        /// <returns></returns>
+        public static int PingPongInt( int t, int length ) {
+            int r = t % ( 2 * length );
+            if ( r < length )
+                return r;
+            else
+                return length * 2 - r;
+        }
+        #endregion
     }
 }
