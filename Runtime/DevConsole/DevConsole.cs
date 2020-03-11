@@ -20,8 +20,9 @@ namespace Utilikit {
         public Button devConsoleScreenButtonPrefab;
 
         public DevConsoleButton devConsoleButtonPrefab;
-        public DevConsoleSlider devConsoleSliderPrefab;
         public DevConsoleToggle devConsoleTogglePrefab;
+        public DevConsoleIntField devConsoleIntField;
+        public DevConsoleSlider devConsoleSliderPrefab;
 
         private int currentScreen;
         private List<DevConsoleScreen> _screens = new List<DevConsoleScreen>();
@@ -62,20 +63,28 @@ namespace Utilikit {
                 newButton.Init( methodAttrs.method, methodAttrs.attribute );
             }
 
-            // populate sliders
-            var sliderProperties = GetPropertiesWithAttribute<DevConsoleSliderAttribute>( staticProps ).ToArray();
-            for ( int i = 0; i < sliderProperties.Length; i++ ) {
-                var sliderAttr = sliderProperties[i];
-                var slider = CreateDevConsoleItem( devConsoleSliderPrefab, sliderAttr.attribute );
-                slider.Init( sliderAttr.property, sliderAttr.attribute );
-            }
-
             // populate toggles
             var toggleProperties = GetPropertiesWithAttribute<DevConsoleToggleAttribute>( staticProps ).ToArray();
             for ( int i = 0; i < toggleProperties.Length; i++ ) {
                 var toggleAttr = toggleProperties[i];
                 var toggle = CreateDevConsoleItem( devConsoleTogglePrefab, toggleAttr.attribute );
                 toggle.Init( toggleAttr.property, toggleAttr.attribute );
+            }
+
+            // populate int fields
+            var intFieldProps = GetPropertiesWithAttribute<DevConsoleIntFieldAttribute>( staticProps ).ToArray();
+            for ( int i = 0; i < intFieldProps.Length; i++ ) {
+                var intFieldAttr = intFieldProps[i];
+                var intField = CreateDevConsoleItem( devConsoleIntField, intFieldAttr.attribute );
+                intField.Init( intFieldAttr.property, intFieldAttr.attribute );
+            }
+
+            // populate sliders
+            var sliderProperties = GetPropertiesWithAttribute<DevConsoleSliderAttribute>( staticProps ).ToArray();
+            for ( int i = 0; i < sliderProperties.Length; i++ ) {
+                var sliderAttr = sliderProperties[i];
+                var slider = CreateDevConsoleItem( devConsoleSliderPrefab, sliderAttr.attribute );
+                slider.Init( sliderAttr.property, sliderAttr.attribute );
             }
         }
 

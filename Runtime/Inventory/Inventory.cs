@@ -18,8 +18,7 @@ namespace Utilikit {
         }
 
         public delegate void InventoryChangedEvent( string modifiedItemId, int newItemQuantity, int change );
-        public event InventoryChangedEvent ItemAdded;
-        public event InventoryChangedEvent ItemRemoved;
+        public event InventoryChangedEvent ItemChanged;
 
 #if UNITY_EDITOR
         // for domain reloading
@@ -50,6 +49,20 @@ namespace Utilikit {
             }
         }
 
+        public void SetItemQuantity( string itemId, int newQuantity ) {
+            if ( newQuantity <= 0 )
+                throw new ArgumentException( "Invalid number of items to set" );
+
+            int change;
+            if ( _inventoryQuantities.TryGetValue( itemId, out int currentAmount ) )
+                change = newQuantity - currentAmount;
+            else
+                change = newQuantity;
+
+            _inventoryQuantities[itemId] = newQuantity;
+            ItemChanged?.Invoke( itemId, newQuantity, change );
+        }
+
         public void AddItems( string itemId, int quantity = 1 ) {
             if ( quantity <= 0 )
                 throw new ArgumentException( "Invalid number of items to add" );
@@ -57,11 +70,11 @@ namespace Utilikit {
             if ( _inventoryQuantities.TryGetValue( itemId, out int existingAmount ) ) {
                 existingAmount += quantity;
                 _inventoryQuantities[itemId] = existingAmount;
-                ItemAdded?.Invoke( itemId, existingAmount, quantity );
+                ItemChanged?.Invoke( itemId, existingAmount, quantity );
             }
             else {
                 _inventoryQuantities[itemId] = quantity;
-                ItemAdded?.Invoke( itemId, quantity, quantity );
+                ItemChanged?.Invoke( itemId, quantity, quantity );
             }
         }
 
@@ -85,7 +98,7 @@ namespace Utilikit {
             else {
                 _inventoryQuantities[itemId] = remainingQuantity;
             }
-            ItemRemoved?.Invoke( itemId, remainingQuantity, -quantity );
+            ItemChanged?.Invoke( itemId, remainingQuantity, -quantity );
 
             return true;
         }
