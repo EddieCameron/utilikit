@@ -98,13 +98,12 @@ namespace Utilikit {
             if ( !Bounds.Contains( point ) )
                 return false;
 
-            return GetWindingNumber( point ) > 0;
+            return GetWindingNumber( point ) != 0;
         }
 
         /// <summary>
         /// How many times does the shape "wind" around this point
         /// - 0 means point is outside shape
-        /// >= 1 is inside
         /// </summary>
         /// <param name="point"></param>
         /// <returns></returns>
@@ -262,6 +261,19 @@ namespace Utilikit {
         /// </summary>
         void SetDirty() {
             _boundsCache = null;
+        }
+
+        System.Text.StringBuilder debugSb;
+        public void PrintVertices() {
+            if ( debugSb == null )
+                debugSb = new System.Text.StringBuilder();
+            debugSb.Clear();
+
+            for ( int i = 0; i < NumVertices; i++ ) {
+                Vector2 p0 = vertices[i];
+                debugSb.Append( $"p{i}: {p0} |" );
+            }
+            Debug.Log( debugSb.ToString() );
         }
 
         #if UNITY_EDITOR

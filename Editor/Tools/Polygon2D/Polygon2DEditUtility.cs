@@ -161,7 +161,7 @@ namespace Utilikit {
                         new Vector3( 0, 0, 1 ),
                         new Vector3( 1, 0, 0 ),
                         new Vector3( 0, 1, 0 ),
-                        guiSize * .08f,
+                        guiSize * .1f,
                         Handles.DotHandleCap,
                         Vector3.zero );
                     Handles.color = Color.white;
