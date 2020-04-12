@@ -40,8 +40,10 @@ namespace Utilikit {
             return transform.TransformPoint( p );
         }
 
+#if UNITY_EDITOR
         void OnDrawGizmosSelected() {
             GetWorldSpacePolygon().DrawGizmosInScene();
         }
+#endif
     }
 }

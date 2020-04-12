@@ -71,31 +71,15 @@ namespace Utilikit {
             return false;
         }
 
-        // To find orientation of ordered triplet (p, q, r).
-        // The function returns following values
-        // 0 --> p, q and r are colinear
-        // 1 --> Clockwise
-        // 2 --> Counterclockwise
-        static int orientation( Vector2 p, Vector2 q, Vector2 r ) {
-            // See https://www.geeksforgeeks.org/orientation-3-ordered-points/
-            // for details of below formula.
-            float val = ( q.y - p.y ) * ( r.x - q.x ) -
-                    ( q.x - p.x ) * ( r.y - q.y );
-
-            if ( val == 0 ) return 0; // colinear
-
-            return ( val > 0 ) ? 1 : 2; // clock or counterclock wise
-        }
-
         // The main function that returns true if line segment 'p1q1'
         // and 'p2q2' intersect.
         public static bool TestLineIntersection( Vector2 p1, Vector2 q1, Vector2 p2, Vector2 q2 ) {
             // Find the four orientations needed for general and
             // special cases
-            int o1 = orientation( p1, q1, p2 );
-            int o2 = orientation( p1, q1, q2 );
-            int o3 = orientation( p2, q2, p1 );
-            int o4 = orientation( p2, q2, q1 );
+            int o1 = GetPointToLineOrientation( p1, q1, p2 );
+            int o2 = GetPointToLineOrientation( p1, q1, q2 );
+            int o3 = GetPointToLineOrientation( p2, q2, p1 );
+            int o4 = GetPointToLineOrientation( p2, q2, q1 );
 
             // General case
             if ( o1 != o2 && o3 != o4 )
@@ -129,7 +113,7 @@ namespace Utilikit {
             if ( l2 == 0.0 ) return ( pTest - p0 ).magnitude;   // v == w case
 
             // Consider the line extending the segment, parameterized as v + t (w - v).
-            // We find projection of point p onto the line. 
+            // We find projection of point p onto the line.
             // It falls where t = [(p-v) . (w-v)] / |w-v|^2
             // We clamp t from [0,1] to handle points outside the segment vw.
             float t = Mathf.Max( 0, Mathf.Min( 1, Vector2.Dot( pTest - p0, p1 - p0 ) / l2 ) );
@@ -156,6 +140,25 @@ namespace Utilikit {
             Vector2 offsetToPoint = startToEnd * dot;
             return p0 + offsetToPoint;
         }
+
+        /// <summary>
+        /// Returns 0 if pTest is on line
+        /// +1 if pTest is to the right of line ( three points are clockwise)
+        /// -1 if pTest is to the left (three points are anti-clockwise)
+        /// </summary>
+        /// <param name="p0"></param>
+        /// <param name="p1"></param>
+        /// <param name="pTest"></param>
+        /// <returns></returns>
+        public static int GetPointToLineOrientation( Vector2 p0, Vector2 p1, Vector2 pTest ) {
+            float orientation = ( ( p1.y - p0.y ) * ( pTest.x - p1.x )
+                    - ( p1.x - p0.x ) * ( pTest.y - p1.y ) );
+            if ( orientation == 0 )
+                return 0;
+
+            return orientation > 0 ? 1 : -1;
+        }
+
         #endregion
 
         #region Maths

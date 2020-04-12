@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
+using Random = UnityEngine.Random;
 
 namespace Utilikit {
     /// Poisson-disc sampling using Bridson's algorithm.
@@ -47,9 +49,22 @@ namespace Utilikit {
 
         /// Return a lazy sequence of samples. You typically want to call this in a foreach loop, like so:
         ///   foreach (Vector2 sample in sampler.Samples()) { ... }
-        public IEnumerable<Vector2> Samples() {
+        public IEnumerable<Vector2> Samples( Func<Vector2, bool> filter = null ) {
+
+            Vector2 startSample = new Vector2( Random.value * rect.width, Random.value * rect.height );
+            if ( filter != null ) {
+                int attempts = k;
+                while ( !filter( startSample ) ) {
+                    if ( attempts <= 0 )
+                        yield break;
+
+                    startSample = new Vector2( Random.value * rect.width, Random.value * rect.height );
+                    attempts--;
+                }
+            }
+
             // First sample is choosen randomly
-            yield return AddSample( new Vector2( Random.value * rect.width, Random.value * rect.height ) );
+            yield return AddSample( startSample );
             while ( activeSamples.Count > 0 ) {
 
                 // Pick a random active sample
@@ -65,7 +80,8 @@ namespace Utilikit {
                     Vector2 candidate = sample + r * new Vector2( Mathf.Cos( angle ), Mathf.Sin( angle ) );
 
                     // Accept candidates if it's inside the rect and farther than 2 * radius to any existing sample.
-                    if ( rect.Contains( candidate ) && IsFarEnough( candidate ) ) {
+                    if ( rect.Contains( candidate ) && IsFarEnough( candidate ) &&
+                        ( filter == null || filter( candidate ) ) ) {
                         found = true;
                         yield return AddSample( candidate );
                         break;

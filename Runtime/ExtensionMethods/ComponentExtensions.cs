@@ -47,6 +47,39 @@ public static class ComponentExtensions {
     }
 
     /// <summary>
+    /// Like GetComponent, but returns a script component that implements a given interface
+    /// Not thread safe
+    /// </summary>
+    /// <typeparam name="T">Component interface</typeparam>
+    /// <param name="component"></param>
+    /// <returns></returns>
+    public static bool TryGetComponentWithInterface<T>( this GameObject gameObject, out T interfaceInstance ) where T : class {
+        _tempComponentList.Clear();
+        gameObject.GetComponents( _tempComponentList );
+        int componentCount = _tempComponentList.Count;
+        for ( int i = 0; i < componentCount; i++ ) {
+            if ( _tempComponentList[i] is T t ) {
+                interfaceInstance = t;
+                return true;
+            }
+        }
+
+        interfaceInstance = null;
+        return false;
+    }
+
+    /// <summary>
+    /// Like GetComponent, but returns a script component that implements a given interface
+    /// Not thread safe
+    /// </summary>
+    /// <typeparam name="T">Component interface</typeparam>
+    /// <param name="component"></param>
+    /// <returns></returns>
+    public static bool TryGetComponentWithInterface<T>( this Component component, out T interfaceInstance ) where T : class {
+        return TryGetComponentWithInterface( component.gameObject, out interfaceInstance );
+    }
+
+    /// <summary>
     /// Like GetComponents, but returns script components that implement a given interface
     /// </summary>
     /// <returns>An array of components with interface T.</returns>

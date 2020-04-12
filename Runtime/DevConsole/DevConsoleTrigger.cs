@@ -11,7 +11,7 @@ namespace Utilikit {
 
         void Update() {
 #if UNITY_EDITOR || !( UNITY_IOS || UNITY_ANDROID )
-            if ( Input.GetMouseButtonDown( 0 ) ) {
+            if ( Input.GetMouseButtonDown( 1 ) ) {
                 float tapTime = Time.realtimeSinceStartup;
                 if ( tapTime - nextLastTap <= TRIPLE_TAP_TIME )
                     DevConsole.ShowDevConsole();

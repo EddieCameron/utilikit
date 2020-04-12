@@ -140,9 +140,32 @@ public class GameObjectPool {
         _pooledObjects.Remove( pooledObject );
     }
 
+    List<PooledObject> _objectsToDestroyTempCache;
+    /// <summary>
+    /// Destroy all spawned and despawned objects in the pool
+    /// </summary>
+    public void DestroyPool() {
+        DespawnAll();
+
+        if ( _objectsToDestroyTempCache == null )
+            _objectsToDestroyTempCache = new List<PooledObject>();
+        else
+            _objectsToDestroyTempCache.Clear();
+        _objectsToDestroyTempCache.AddRange( _pooledObjects );
+
+        foreach ( var item in _objectsToDestroyTempCache ) {
+            RemoveFromPool( item );
+            GameObject.Destroy( item.gameObject );
+        }
+
+        if ( _spawnedObjects.Count > 0 || _pooledObjects.Count > 0 ) {
+            Debug.LogError( "Items were created while pool was despawned." );
+        }
+    }
+
     void FillPool( int numObjectsToSpawn, Transform parent ) {
         for ( int i = 0; i < numObjectsToSpawn; i++ ) {
-            PooledObject newObject = InstantiateObject( parent, parent.position, parent.rotation );
+            PooledObject newObject = InstantiateObject( parent, parent ? parent.position : Vector3.zero, parent ? parent.rotation : Quaternion.identity );
 
             newObject.gameObject.SetActive( false );
             _pooledObjects.AddLast( newObject );

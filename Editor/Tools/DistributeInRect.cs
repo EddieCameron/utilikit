@@ -6,7 +6,9 @@ using UnityEngine.UI;
 using Utilikit;
 using Random = UnityEngine.Random;
 using UnityEditor;
+#if UNITY_EDITOR
 using UnityEditor.EditorTools;
+#endif
 
 namespace Utilikit {
     [EditorTool( "Distribute In Rect" )]
