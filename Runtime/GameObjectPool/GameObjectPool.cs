@@ -41,7 +41,7 @@ public class GameObjectPool {
     /// <param name="parent"></param>
     /// <param name="worldPosition"></param>
     /// <returns></returns>
-    public PooledObject Spawn( Transform parent = null, Vector3 worldPosition = default( Vector3 ), Quaternion worldRotation = default( Quaternion ), bool leaveInactive = false ) {
+    public PooledObject Spawn( Vector3 worldPosition = default( Vector3 ), Quaternion worldRotation = default( Quaternion ), Transform parent = null, bool leaveInactive = false ) {
         if ( _pooledObjects.Count > 0 ) {
             // pull from pool
             PooledObject toSpawn = _pooledObjects.First.Value;
@@ -78,8 +78,8 @@ public class GameObjectPool {
     /// <param name="parent"></param>
     /// <param name="worldPosition"></param>
     /// <returns></returns>
-    public TComponent Spawn<TComponent>( Transform parent = null, Vector3 worldPosition = default( Vector3 ), Quaternion worldRotation = default( Quaternion ), bool leaveInactive = false ) where TComponent : UnityEngine.Component {
-        return Spawn( parent, worldPosition, worldRotation, leaveInactive ).GetComponent<TComponent>();
+    public TComponent Spawn<TComponent>( Vector3 worldPosition = default( Vector3 ), Quaternion worldRotation = default( Quaternion ), Transform parent = null, bool leaveInactive = false ) where TComponent : UnityEngine.Component {
+        return Spawn( worldPosition, worldRotation, parent, leaveInactive ).GetComponent<TComponent>();
     }
 
     /// <summary>
