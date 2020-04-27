@@ -7,11 +7,13 @@ using Random = UnityEngine.Random;
 namespace Utilikit {
     public class AsyncHelper : IUnityLifecycleListener {
 
-        public static void DoAfterDelay( float delaySeconds, Action action, bool useScaledTime = true ) {
+        public static DelayedJob DoAfterDelay( float delaySeconds, Action action, bool useScaledTime = true ) {
             if ( delaySeconds < 0 )
                 throw new ArgumentException( "Must have positive delay" );
 
-            Instance.jobs.Add( new DelayedJob { delaySeconds = delaySeconds, job = action, useScaledTime = useScaledTime } );
+            var job = new DelayedJob { ExecuteInSeconds = delaySeconds, Job = action, UseScaledTime = useScaledTime };
+            Instance.jobs.Add( job );
+            return job;
         }
 
         static AsyncHelper _instance;
@@ -30,7 +32,7 @@ namespace Utilikit {
         }
 
 
-        List<DelayedJob> jobs = new List<DelayedJob>();
+        HashSet<DelayedJob> jobs = new HashSet<DelayedJob>();
 
         public AsyncHelper() {
             UnityLifecycleSubscriber.AddListener( this );
@@ -40,25 +42,37 @@ namespace Utilikit {
             jobs.Clear();
         }
 
+        HashSet<DelayedJob> completedJobs = new HashSet<DelayedJob>();
         void IUnityLifecycleListener.Update() {
-            for ( int i = jobs.Count - 1; i >= 0; i-- ) {
-                var job = jobs[i];
-                job.delaySeconds -= job.useScaledTime ? Time.deltaTime : Time.unscaledDeltaTime;
-                if ( job.delaySeconds < 0 ) {
-                    // delay complete
-                    job.job?.Invoke();
-                    jobs.RemoveAt( i );
+            completedJobs.Clear();
+            foreach ( var job in jobs ) {
+                if ( job.IsCancelled ) {
+                    completedJobs.Add( job );
                 }
                 else {
-                    jobs[i] = job;
+                    job.ExecuteInSeconds -= job.UseScaledTime ? Time.deltaTime : Time.unscaledDeltaTime;
+                    if ( job.ExecuteInSeconds <= 0 ) {
+                        // delay complete
+                        completedJobs.Add( job );
+                    }
                 }
+            }
+
+            foreach ( var job in completedJobs ) {
+                if ( !job.IsCancelled )
+                    job.Job?.Invoke();
+
+                jobs.Remove( job );
             }
         }
 
-        struct DelayedJob {
-            public float delaySeconds;
-            public Action job;
-            public bool useScaledTime;
+        public class DelayedJob {
+            public float ExecuteInSeconds { get; set; }
+            public Action Job { get; set; }
+            public bool UseScaledTime { get; set; } = true;
+
+            public bool IsCancelled { get; private set; } = false;
+            public bool Cancel() => IsCancelled = true;
         }
     }
 
