@@ -43,14 +43,19 @@ namespace Utilikit {
             }
         }
 
+        static List<IUnityLifecycleListener> _listenerCache = new List<IUnityLifecycleListener>();
         static void HandleUpdate() {
-            foreach ( var listener in _listeners ) {
+            _listenerCache.Clear();
+            _listenerCache.AddRange( _listeners );
+            foreach ( var listener in _listenerCache ) {
                 listener?.Update();
             }
         }
 
         static void HandleOnApplicationQuit() {
-            foreach ( var listener in _listeners ) {
+            _listenerCache.Clear();
+            _listenerCache.AddRange( _listeners );
+            foreach ( var listener in _listenerCache ) {
                 listener?.OnApplicationQuit();
             }
         }

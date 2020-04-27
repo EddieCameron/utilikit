@@ -40,7 +40,6 @@ namespace Utilikit {
         }
 
         void OnTriggerEnter2D( Collider2D other ) {
-            Debug.Log( other );
             if ( !enabled )
                 return;
 
