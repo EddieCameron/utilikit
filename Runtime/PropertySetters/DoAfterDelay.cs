@@ -33,7 +33,6 @@ public class DoAfterDelay : MonoBehaviour {
             float delay = delayEvents[i].delaySeconds;
             DelayEvent onComplete = delayEvents[i].onDelayAfterOnEnable;
             _jobs[i] = AsyncHelper.DoAfterDelay( delay, () => {
-                Debug.Log( delay + " " + onComplete.GetPersistentTarget( 0 ) );
                 onComplete?.Invoke();
             }
             );

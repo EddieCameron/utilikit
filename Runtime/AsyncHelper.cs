@@ -111,18 +111,22 @@ namespace Utilikit {
         float timeSinceLastJob;
         float thisJobInterval;
 
-        public RepeatingJob( Action job, float secondsBetweenJobs ) {
+        public RepeatingJob( Action job, float secondsBetweenJobs, bool waitForExecute = false ) {
             this._minTimeBetweenJobs = secondsBetweenJobs;
             this._maxTimeBetweenJobs = secondsBetweenJobs;
             this.job = job;
+            if ( waitForExecute )
+                thisJobInterval = secondsBetweenJobs;
 
             UnityLifecycleSubscriber.AddListener( this );
         }
 
-        public RepeatingJob( Action job, float minSecondsBetweenJobs, float maxSecondsBetweenJobs ) {
+        public RepeatingJob( Action job, float minSecondsBetweenJobs, float maxSecondsBetweenJobs, bool waitForExecute = false ) {
             this._minTimeBetweenJobs = minSecondsBetweenJobs;
             this._maxTimeBetweenJobs = maxSecondsBetweenJobs;
             this.job = job;
+            if ( waitForExecute )
+                thisJobInterval = Random.Range( _minTimeBetweenJobs, _maxTimeBetweenJobs );
 
             UnityLifecycleSubscriber.AddListener( this );
         }
@@ -152,6 +156,7 @@ namespace Utilikit {
         }
 
         void IUnityLifecycleListener.OnApplicationQuit() {
+            Stop();
         }
     }
 }

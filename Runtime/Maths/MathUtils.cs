@@ -50,6 +50,22 @@ namespace Utilikit {
         }
         #endregion
 
+        #region Vectors
+        /// <summary>
+        /// Get the angle required to rotate anti-clockwise from (1, 0) to this vector
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public static float ToDegrees( this Vector2 v ) {
+            return Mathf.Atan2( v.y, v.x ) * Mathf.Rad2Deg;
+        }
+
+        public static Vector2 GetAngleVector( float angleDegrees ) {
+            float rad = angleDegrees * Mathf.Deg2Rad;
+            return new Vector2( Mathf.Cos( rad ), Mathf.Sin( rad ) );
+        }
+        #endregion
+
         #region  Geometry
         /// <summary>
         /// Return the length of a vector as projected along a given direction
