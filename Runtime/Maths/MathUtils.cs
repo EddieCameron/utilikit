@@ -60,6 +60,11 @@ namespace Utilikit {
             return Mathf.Atan2( v.y, v.x ) * Mathf.Rad2Deg;
         }
 
+        /// <summary>
+        /// Create a unit vector that is rotated the given degrees anticlockwise from (1,0)
+        /// </summary>
+        /// <param name="angleDegrees"></param>
+        /// <returns></returns>
         public static Vector2 GetAngleVector( float angleDegrees ) {
             float rad = angleDegrees * Mathf.Deg2Rad;
             return new Vector2( Mathf.Cos( rad ), Mathf.Sin( rad ) );
