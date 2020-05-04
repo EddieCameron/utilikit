@@ -18,7 +18,7 @@ public abstract class Flasher : MonoBehaviour
 
     protected abstract Color ObjectColor { get; set; }
 
-    void Start() {
+    void Awake() {
         if ( setBaseColorOnStart )
             baseColor = ObjectColor;
     }
