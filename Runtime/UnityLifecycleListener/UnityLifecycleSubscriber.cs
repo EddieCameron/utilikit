@@ -48,7 +48,12 @@ namespace Utilikit {
             _listenerCache.Clear();
             _listenerCache.AddRange( _listeners );
             foreach ( var listener in _listenerCache ) {
-                listener?.Update();
+                try {
+                    listener?.Update();
+                }
+                catch ( Exception e ) {
+                    Debug.LogException( e );
+                }
             }
         }
 
@@ -56,7 +61,12 @@ namespace Utilikit {
             _listenerCache.Clear();
             _listenerCache.AddRange( _listeners );
             foreach ( var listener in _listenerCache ) {
-                listener?.OnApplicationQuit();
+                try {
+                    listener?.OnApplicationQuit();
+                }
+                catch ( Exception e ) {
+                    Debug.LogException( e );
+                }
             }
         }
 

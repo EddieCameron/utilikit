@@ -112,6 +112,8 @@ namespace Utilikit {
         private void MakeHomeScreenButton( string toScreen ) {
             var homeScreen = GetScreen( "" );
             var button = Instantiate( devConsoleScreenButtonPrefab, homeScreen.controlRoot );
+            button.transform.SetAsFirstSibling();
+            button.GetComponentInChildren<Text>().text = toScreen;
             button.onClick.AddListener( () => GoToScreen( toScreen ) );
         }
 
@@ -129,6 +131,7 @@ namespace Utilikit {
             // add button to home screen
             if ( !string.IsNullOrEmpty( screenName ) ) {
                 MakeHomeScreenButton( screenName );
+                screen.gameObject.SetActive( false );
             }
             return screen;
         }
