@@ -28,13 +28,6 @@ public class ReorderableListDrawer : PropertyDrawer {
         list = new ReorderableList( listProperty.serializedObject, listProperty, draggable: true, displayHeader: true, displayAddButton: true, displayRemoveButton: true );
         _listsPerProp[listProperty.propertyPath] = list;
 
-        float height = 0f;
-        for(var i = 0; i < listProperty.arraySize; i++)
-        {
-            height = Mathf.Max( height, EditorGUI.GetPropertyHeight( listProperty.GetArrayElementAtIndex( i ), true ) );
-        }
-        list.elementHeight = height;
-
         list.drawHeaderCallback += rect => {
             EditorGUI.LabelField( rect, prop.displayName );
         };
@@ -48,15 +41,27 @@ public class ReorderableListDrawer : PropertyDrawer {
                 if ( SerializedProperty.EqualContents( elementProp, end ) )
                     break;
 
-                rect.height = EditorGUI.GetPropertyHeight( elementProp );
+                rect.height = EditorGUI.GetPropertyHeight( elementProp, includeChildren: true );
                 EditorGUI.PropertyField( rect, elementProp, includeChildren: true );
                 rect.y += rect.height;
             } while ( elementProp.Next( enterChildren: false ) );
         };
 
         list.elementHeightCallback += idx => {
-            SerializedProperty elementProp = list.serializedProperty.GetArrayElementAtIndex( idx );
-            return EditorGUI.GetPropertyHeight( elementProp, includeChildren: true ) - EditorGUIUtility.singleLineHeight;
+            SerializedProperty elementProp = listProperty.GetArrayElementAtIndex( idx );
+
+            // ahve to do manually because GetPropertyHeight was returning wrong values for the list element
+            float height = 0;
+            SerializedProperty end = elementProp.GetEndProperty();
+            elementProp.Next( enterChildren: true );
+            do {
+                if ( SerializedProperty.EqualContents( elementProp, end ) )
+                    break;
+
+                height += EditorGUI.GetPropertyHeight( elementProp );
+            } while ( elementProp.Next( enterChildren: false ) );
+
+            return height;
         };
 
         return list;
