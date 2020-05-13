@@ -2,15 +2,10 @@
  * © Eddie Cameron 2019
  * ----------------------------
  */
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
-using UnityEngine.UI;
-using Utilikit;
-using Random = UnityEngine.Random;
 
 [CustomPropertyDrawer( typeof( ReorderableList<> ), useForChildren: true )]
 public class ReorderableListDrawer : PropertyDrawer {
@@ -51,7 +46,7 @@ public class ReorderableListDrawer : PropertyDrawer {
             SerializedProperty elementProp = listProperty.GetArrayElementAtIndex( idx );
 
             // ahve to do manually because GetPropertyHeight was returning wrong values for the list element
-            float height = 0;
+            float height = 4;
             SerializedProperty end = elementProp.GetEndProperty();
             elementProp.Next( enterChildren: true );
             do {
