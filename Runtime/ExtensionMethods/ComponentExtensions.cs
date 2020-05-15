@@ -153,8 +153,9 @@ public static class ComponentExtensions {
     /// <typeparam name="T">Interface type</typeparam>
     /// <param name="component"></param>
     /// <returns></returns>
-    public static void GetComponentsInParentsWithInterface<T>( this GameObject gameObject, List<T> listToFill ) where T : class {
-        GetComponentsWithInterface<T>( gameObject, listToFill );
+    public static void GetComponentsInParentsWithInterface<T>( this GameObject gameObject, List<T> listToFill, bool includeInactive = false ) where T : class {
+        if ( includeInactive || gameObject.activeInHierarchy )
+            GetComponentsWithInterface<T>( gameObject, listToFill );
 
         // if we're the root, no components have type T
         Transform parent = gameObject.transform.parent;
