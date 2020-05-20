@@ -10,6 +10,9 @@ namespace Utilikit {
 
         public bool WasSpawnedFromPool => SourcePool != null;
 
+        public event Action<PooledObject> DidSpawn;
+        public event Action<PooledObject> DidDespawn;
+
         bool isDespawning;
 
         void OnDestroy() {
@@ -43,6 +46,8 @@ namespace Utilikit {
 
             SourcePool = pool;
             isDespawning = false;
+
+            DidSpawn?.Invoke( this );
         }
 
         /// <summary>
@@ -55,6 +60,8 @@ namespace Utilikit {
 
             SourcePool = null;
             isDespawning = true;
+
+            DidDespawn?.Invoke( this );
         }
     }
 }
