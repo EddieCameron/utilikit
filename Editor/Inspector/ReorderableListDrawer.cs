@@ -29,34 +29,17 @@ public class ReorderableListDrawer : PropertyDrawer {
 
         list.drawElementCallback += ( rect, index, isActive, isFocused ) => {
             SerializedProperty elementProp = list.serializedProperty.GetArrayElementAtIndex( index );
-
-            SerializedProperty end = elementProp.GetEndProperty();
-            elementProp.Next( enterChildren: true );
-            do {
-                if ( SerializedProperty.EqualContents( elementProp, end ) )
-                    break;
-
-                rect.height = EditorGUI.GetPropertyHeight( elementProp, includeChildren: true );
+            if ( elementProp.hasVisibleChildren ) {
                 EditorGUI.PropertyField( rect, elementProp, includeChildren: true );
-                rect.y += rect.height;
-            } while ( elementProp.Next( enterChildren: false ) );
+            }
+            else {
+                EditorGUI.PropertyField( rect, elementProp, includeChildren: true, label: GUIContent.none );   // dont draw label if its a single line
+            }
         };
 
         list.elementHeightCallback += idx => {
             SerializedProperty elementProp = listProperty.GetArrayElementAtIndex( idx );
-
-            // ahve to do manually because GetPropertyHeight was returning wrong values for the list element
-            float height = 4;
-            SerializedProperty end = elementProp.GetEndProperty();
-            elementProp.Next( enterChildren: true );
-            do {
-                if ( SerializedProperty.EqualContents( elementProp, end ) )
-                    break;
-
-                height += EditorGUI.GetPropertyHeight( elementProp );
-            } while ( elementProp.Next( enterChildren: false ) );
-
-            return height;
+            return EditorGUI.GetPropertyHeight( elementProp );
         };
 
         return list;

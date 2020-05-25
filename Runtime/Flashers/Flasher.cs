@@ -13,6 +13,7 @@ public abstract class Flasher : MonoBehaviour
     public AnimationCurve flashEase = AnimationCurve.Linear( 0, 0, 1, 1 );
 
     private bool isFlashing;
+    private bool isRepeating;
     private Color targetColor;
     private float flashStartTime;
 
@@ -30,8 +31,13 @@ public abstract class Flasher : MonoBehaviour
 
         float t = ( Time.time - flashStartTime ) / flashTime;
         if ( t > 1 ) {
-            isFlashing = false;
-            ObjectColor = baseColor;
+            if ( isRepeating ) {
+                Flash( targetColor, isRepeating: true );   // reset flash
+            }
+            else {
+                isFlashing = false;
+                ObjectColor = baseColor;
+            }
             return;
         }
 
@@ -39,14 +45,19 @@ public abstract class Flasher : MonoBehaviour
         ObjectColor = Color.Lerp( flashColor, baseColor, t );
     }
 
-    public void Flash() {
-        Flash( flashColor );
+    public void Flash( bool isRepeating = false ) {
+        Flash( flashColor, isRepeating );
     }
 
-    public void Flash( Color overrideFlashColor ) {
-        isFlashing = true;
-        targetColor = overrideFlashColor;
-        flashStartTime = Time.time;
-        ObjectColor = overrideFlashColor;
+    public void Flash( Color overrideFlashColor, bool isRepeating = false ) {
+        this.isFlashing = true;
+        this.isRepeating = isRepeating;
+        this.targetColor = overrideFlashColor;
+        this.flashStartTime = Time.time;
+        this.ObjectColor = overrideFlashColor;
+    }
+
+    public void StopRepeatingFlash() {
+        this.isRepeating = false;
     }
 }
