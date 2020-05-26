@@ -7,11 +7,11 @@ using Random = UnityEngine.Random;
 namespace Utilikit {
     public class AsyncHelper : IUnityLifecycleListener {
 
-        public static DelayedJob DoAfterDelay( float delaySeconds, Action action, bool useScaledTime = true ) {
+        public static DelayedJob DoAfterDelay( float delaySeconds, Action action, bool useScaledTime = true, Component owner = null ) {
             if ( delaySeconds < 0 )
                 throw new ArgumentException( "Must have positive delay" );
 
-            var job = new DelayedJob { ExecuteInSeconds = delaySeconds, Job = action, UseScaledTime = useScaledTime };
+            var job = new DelayedJob { ExecuteInSeconds = delaySeconds, Job = action, UseScaledTime = useScaledTime, Owner = owner };
             Instance.jobs.Add( job );
             return job;
         }
@@ -59,10 +59,16 @@ namespace Utilikit {
             }
 
             foreach ( var job in completedJobs ) {
-                if ( !job.IsCancelled )
-                    job.Job?.Invoke();
-
-                jobs.Remove( job );
+                try {
+                    if ( job.CanRun )
+                        job.Job?.Invoke();
+                }
+                catch ( Exception e ) {
+                    Debug.LogError( "Error excecuting job: " + e.Message );
+                }
+                finally {
+                    jobs.Remove( job );
+                }
             }
         }
 
@@ -71,8 +77,20 @@ namespace Utilikit {
             public Action Job { get; set; }
             public bool UseScaledTime { get; set; } = true;
 
+            bool _needValidOwner;
+            Component _owner;
+            public Component Owner {
+                get => _owner;
+                set {
+                    _needValidOwner = value != null;
+                    _owner = value;
+                }
+            }
+
             public bool IsCancelled { get; private set; } = false;
             public bool Cancel() => IsCancelled = true;
+
+            public bool CanRun => !IsCancelled && !( _needValidOwner && Owner == null );
         }
     }
 
