@@ -14,6 +14,15 @@ namespace Utilikit {
 
         public int NumVertices => vertices.Count;
 
+        bool? _isClockwiseCached;
+        public bool IsClockwise {
+            get  {
+                if ( !_isClockwiseCached.HasValue )
+                    _isClockwiseCached = CalculateWinding();
+                return _isClockwiseCached.Value;
+            }
+        }
+
         Rect? _boundsCache = null;
         public Rect Bounds {
             get {
@@ -66,7 +75,7 @@ namespace Utilikit {
             }
             SetDirty();
         }
-        
+
         public void Scale( Vector2 scale ) {
             for ( int i = 0; i < NumVertices; i++ ) {
                 vertices[i] *= scale;
@@ -81,6 +90,11 @@ namespace Utilikit {
 
         public void InsertVertex( int atIdx, Vector2 point ) {
             vertices.Insert( atIdx, point );
+            SetDirty();
+        }
+
+        public void AddVertex( Vector2 point ) {
+            vertices.Add( point );
             SetDirty();
         }
 
@@ -257,11 +271,194 @@ namespace Utilikit {
         }
 
         /// <summary>
+        /// Returns true if polygon is clockwise, or false if anticlockwise.
+        /// Only makes sense for simple polygons
+        /// https://stackoverflow.com/questions/1165647/how-to-determine-if-a-list-of-polygon-points-are-in-clockwise-order/1180256#1180256
+        /// </summary>
+        /// <returns></returns>
+        bool CalculateWinding() {
+            if ( !IsValid )
+                return false;
+
+            // find point on convex hull
+            int aIdx = 0;
+            Vector2 a = vertices[0];
+            for ( int i = 1; i < vertices.Count; i++ ) {
+                if ( vertices[i].x < a.x ) {
+                    aIdx = i;
+                    a = vertices[i];
+                }
+                else if ( vertices[i].x == a.x && vertices[i].y < a.y ) {
+                    aIdx = i;
+                    a = vertices[i];
+                }
+            }
+
+            int bIdx = aIdx == 0 ? vertices.Count - 1 : aIdx - 1;
+            int cIdx = ( aIdx + 1 ) % vertices.Count;
+
+            bool isCToLeft = IsLeft( a, vertices[bIdx], vertices[cIdx] ) > 0;
+            return !isCToLeft;
+        }
+
+        /// <summary>
         /// Mark lazy calculated values as needing to be refreshed
         /// </summary>
         void SetDirty() {
             _boundsCache = null;
+            _isClockwiseCached = null;
         }
+
+#region Triangulation
+        /// <summary>
+        /// Uses the ear-clipping algorithm to break the polygon into a list of triangles, for rendering.async ONly works if polygon is simple (non-self-intersecting)
+        /// </summary>
+        /// <param name="outTriangleIndices"></param>
+        public void Triangulate( List<int> outTriangleIndices ) {
+            if ( !IsValid )
+                return;
+
+            // https://www.geometrictools.com/Documentation/TriangulationByEarClipping.pdf
+            var remainingVertices = new LinkedList<int>();
+            var ears = new LinkedList<LinkedListNode<int>>();
+            var convexVertices = new HashSet<LinkedListNode<int>>();
+            var reflexVertices = new HashSet<LinkedListNode<int>>();
+
+            bool IsReflex( LinkedListNode<int> v ) {
+                // is angle > 180?
+                var next = v.Next ?? v.List.First;
+                var previous = v.Previous ?? v.List.Last;
+                return IsLeft( vertices[next.Value], vertices[v.Value], vertices[next.Value] ) < 0;
+            }
+
+            bool IsEar( LinkedListNode<int> v ) {
+                if ( reflexVertices.Count == 0 )
+                    return true;    // if polygon is convex, everybody is an ear
+
+                // if any reflex vertex is within the triangle formed by this and neighbouring points, it's not an ear
+                var next = v.Next ?? v.List.First;
+                var previous = v.Previous ?? v.List.Last;
+
+                Vector2 a = vertices[v.Value];
+                Vector2 b = vertices[next.Value];
+                Vector2 c = vertices[previous.Value];
+                float? triangleArea = null;    // calculate lazily
+                foreach ( var r in reflexVertices ) {
+                    if ( r == next || r == previous )
+                        continue;   // don't look at triangle vertices
+
+                    Vector2 p = vertices[r.Value];
+                    // https://stackoverflow.com/questions/2049582/how-to-determine-if-a-point-is-in-a-2d-triangle
+                    // assumes ABC are clockwise, so area is -ve
+                    var s = -( a.y * c.x - a.x * c.y + ( c.y - a.y ) * p.x + ( a.x - c.x ) * p.y );
+                    if ( s >= 0 ) {
+                        var t = -( a.x * b.y - a.y * b.x + ( a.y - b.y ) * p.x + ( b.x - a.x ) * p.y );
+                        if ( t >= 0 ) {
+                            if ( !triangleArea.HasValue )
+                                triangleArea = -0.5f * ( -b.y * c.x + a.y * ( -b.x + c.x ) + a.x * ( b.y - c.y ) + b.x * c.y );
+
+                            if ( ( s + t ) < 2 * triangleArea ) {
+                                // point is in triangle, not an ear
+                                return false;
+                            }
+                        }
+                    }
+                }
+
+                // no points inside triangle
+                return true;
+            }
+
+            // add vertices in clockwise order
+            if ( IsClockwise ) {
+                for ( int i = 0; i < vertices.Count; i++ ) {
+                    remainingVertices.AddLast( i );
+                }
+            }
+            else {
+                for ( int i = 0; i < vertices.Count; i++ ) {
+                    remainingVertices.AddFirst( i );
+                }
+            }
+            if ( remainingVertices.Count == 3 ) {
+                outTriangleIndices.AddRange( remainingVertices );
+                return;
+            }
+
+
+            // find reflex (concave) vertices and "ears" (confirmed triangle tips)
+            var node = remainingVertices.First;
+            while ( node != null ) {
+                if ( IsReflex( node ) )
+                    reflexVertices.Add( node );
+                else
+                    convexVertices.Add( node );
+
+                node = node.Next;
+            }
+            foreach ( var v in convexVertices ) {
+                if ( IsEar( v ) )
+                    ears.AddLast( v );
+            }
+
+            // ok, now we remove each ear in turn, and updte thei adjacent vertices
+            while ( remainingVertices.Count > 3 ) {
+                var ear = ears.First;
+                var next = ear.Value.Next ?? ear.Value.List.First;
+                var previous = ear.Value.Previous ?? ear.Value.List.Last;
+
+                // clip triangle
+                outTriangleIndices.Add( ear.Value.Value );
+                outTriangleIndices.Add( next.Value );
+                outTriangleIndices.Add( previous.Value );
+
+                remainingVertices.Remove( ear.Value );
+
+                if ( remainingVertices.Count == 3 ) {
+                    // last triangle
+                    outTriangleIndices.AddRange( remainingVertices );
+                    return;
+                }
+
+                // look at adjacent vertices and see if they need updating
+                // previous
+                bool checkEar = false;
+                if ( reflexVertices.Contains( previous ) ) {
+                    if ( !IsReflex( previous ) ) {
+                        checkEar = true;
+                        reflexVertices.Remove( previous );
+                    }
+                }
+                else if ( ears.Last.Value != previous ) {
+                    // if not already an ear
+                    checkEar = true;
+                }
+                if ( checkEar && IsEar( previous )) {
+                    ears.AddFirst( previous );
+                }
+
+                // next
+                checkEar = false;
+                if ( reflexVertices.Contains( next ) ) {
+                    if ( !IsReflex( next ) ) {
+                        checkEar = true;
+                        reflexVertices.Remove( next );
+                    }
+                }
+                else if ( ear.Next == null || ear.Next.Value != previous ) {
+                    // if not already an ear
+                    checkEar = true;
+                }
+                if ( checkEar && IsEar( previous )) {
+                    ears.AddAfter( ear, next );
+                }
+
+                ears.Remove( ear );
+            }
+
+            throw new InvalidProgramException( "Something bad happened with the ears" );
+        }
+#endregion
 
         System.Text.StringBuilder debugSb;
         public void PrintVertices() {
