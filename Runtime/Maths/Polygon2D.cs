@@ -297,7 +297,7 @@ namespace Utilikit {
             int bIdx = aIdx == 0 ? vertices.Count - 1 : aIdx - 1;
             int cIdx = ( aIdx + 1 ) % vertices.Count;
 
-            bool isCToLeft = IsLeft( a, vertices[bIdx], vertices[cIdx] ) > 0;
+            bool isCToLeft = IsLeft( vertices[bIdx], a, vertices[cIdx] ) > 0;
             return !isCToLeft;
         }
 
@@ -328,7 +328,8 @@ namespace Utilikit {
                 // is angle > 180?
                 var next = v.Next ?? v.List.First;
                 var previous = v.Previous ?? v.List.Last;
-                return IsLeft( vertices[next.Value], vertices[v.Value], vertices[next.Value] ) < 0;
+                bool isLeft = IsLeft( vertices[previous.Value], vertices[v.Value], vertices[next.Value] ) > 0;
+                return isLeft;
             }
 
             bool IsEar( LinkedListNode<int> v ) {
@@ -348,21 +349,16 @@ namespace Utilikit {
                         continue;   // don't look at triangle vertices
 
                     Vector2 p = vertices[r.Value];
-                    // https://stackoverflow.com/questions/2049582/how-to-determine-if-a-point-is-in-a-2d-triangle
-                    // assumes ABC are clockwise, so area is -ve
-                    var s = -( a.y * c.x - a.x * c.y + ( c.y - a.y ) * p.x + ( a.x - c.x ) * p.y );
-                    if ( s >= 0 ) {
-                        var t = -( a.x * b.y - a.y * b.x + ( a.y - b.y ) * p.x + ( b.x - a.x ) * p.y );
-                        if ( t >= 0 ) {
-                            if ( !triangleArea.HasValue )
-                                triangleArea = -0.5f * ( -b.y * c.x + a.y * ( -b.x + c.x ) + a.x * ( b.y - c.y ) + b.x * c.y );
+                    // if p is to the left of any side in clockwise triangle, it is not inside the triangle
+                    if ( IsLeft( a, b, p ) > 0 )
+                        continue;
+                    if ( IsLeft( b, c, p ) > 0 )
+                        continue;
+                    if ( IsLeft( c, a, p ) > 0 )
+                        continue;
 
-                            if ( ( s + t ) < 2 * triangleArea ) {
-                                // point is in triangle, not an ear
-                                return false;
-                            }
-                        }
-                    }
+                    // p must be inside or on triangle
+                    return false;
                 }
 
                 // no points inside triangle
@@ -403,6 +399,26 @@ namespace Utilikit {
 
             // ok, now we remove each ear in turn, and updte thei adjacent vertices
             while ( remainingVertices.Count > 3 ) {
+
+                if ( ears.Count == 0 ) {
+                    var debugNode = remainingVertices.First;
+                    while ( debugNode != null ) {
+                        var nextDebugNode = debugNode.Next ?? remainingVertices.First;
+                        Debug.DrawLine( vertices[debugNode.Value], vertices[nextDebugNode.Value], Color.red, .1f );
+                        debugNode = debugNode.Next;
+                    }
+
+                    for ( int i = 0; i < vertices.Count; i++ ) {
+                        Debug.DrawLine( vertices[i], vertices[( i + 1 ) % vertices.Count] );
+                    }
+                    throw new InvalidOperationException( "Ran out of possible ear vertices, was this polygon complex?" );
+                }
+
+                // Debug.Log( "Ear clip" );
+                // Debug.Log( remainingVertices.GetLogString() );
+                // Debug.Log( ears.GetLogString( e => e.Value.ToString() ) );
+                // Debug.Log( reflexVertices.GetLogString( v => v.Value + " " + vertices[v.Value] ) );
+
                 var ear = ears.First;
                 var next = ear.Value.Next ?? ear.Value.List.First;
                 var previous = ear.Value.Previous ?? ear.Value.List.Last;
@@ -411,6 +427,16 @@ namespace Utilikit {
                 outTriangleIndices.Add( ear.Value.Value );
                 outTriangleIndices.Add( next.Value );
                 outTriangleIndices.Add( previous.Value );
+
+                Vector2 a = vertices[ear.Value.Value];
+                Vector2 b = vertices[next.Value];
+                Vector2 c = vertices[previous.Value];
+
+                var col = ears.Count == 1 ? Color.green : Color.cyan;
+                // Debug.DrawLine( a, b, col, .1f );
+                // Debug.DrawLine( b, c, col, .1f );
+                // Debug.DrawLine( c, a, col, .1f );
+                // Debug.Log( IsEar( ear.Value ) );
 
                 remainingVertices.Remove( ear.Value );
 
@@ -422,35 +448,49 @@ namespace Utilikit {
 
                 // look at adjacent vertices and see if they need updating
                 // previous
-                bool checkEar = false;
-                if ( reflexVertices.Contains( previous ) ) {
-                    if ( !IsReflex( previous ) ) {
-                        checkEar = true;
-                        reflexVertices.Remove( previous );
+                if ( previous == ears.Last.Value ) {
+                    // previous neighbour is an ear, make sure it still is
+                    if ( !IsEar( previous) ) {
+                        ears.RemoveLast();
                     }
                 }
-                else if ( ears.Last.Value != previous ) {
-                    // if not already an ear
-                    checkEar = true;
-                }
-                if ( checkEar && IsEar( previous )) {
-                    ears.AddFirst( previous );
+                else {
+                    bool checkIsEar = true;
+                    if ( reflexVertices.Contains( previous ) ) {
+                        if ( !IsReflex( previous ) ) {
+                            reflexVertices.Remove( previous );
+                        }
+                        else {
+                            checkIsEar = false; // if still reflex, dont check if ear
+                        }
+                    }
+
+                    if ( checkIsEar && IsEar( previous ) ) {
+                        ears.AddFirst( previous );
+                    }
                 }
 
                 // next
-                checkEar = false;
-                if ( reflexVertices.Contains( next ) ) {
-                    if ( !IsReflex( next ) ) {
-                        checkEar = true;
-                        reflexVertices.Remove( next );
+                if ( ear.Next != null && next == ear.Next.Value ) {
+                    // next neighbour is an ear, make sure it still is
+                    if ( !IsEar( next) ) {
+                        ears.Remove( ear.Next );
                     }
                 }
-                else if ( ear.Next == null || ear.Next.Value != previous ) {
-                    // if not already an ear
-                    checkEar = true;
-                }
-                if ( checkEar && IsEar( previous )) {
-                    ears.AddAfter( ear, next );
+                else {
+                    bool checkIsEar = true;
+                    if ( reflexVertices.Contains( next ) ) {
+                        if ( !IsReflex( next ) ) {
+                            reflexVertices.Remove( next );
+                        }
+                        else {
+                            checkIsEar = false;
+                        }
+                    }
+
+                    if ( checkIsEar && IsEar( next ) ) {
+                        ears.AddAfter( ear, next );
+                    }
                 }
 
                 ears.Remove( ear );
@@ -458,7 +498,154 @@ namespace Utilikit {
 
             throw new InvalidProgramException( "Something bad happened with the ears" );
         }
-#endregion
+
+
+        /// <summary>
+        /// Inserts the vertices of the given polygon into this polygon to form a 'hole' connected to the outisde edge (so that the outer 'wraps' around the hole). The hole must fit entirely inside this polygon.
+        /// </summary>
+        /// <param name="holePolygon"></param>
+        public void InsertHole( Polygon2D holePolygon ) {
+            int innerConnection, outerConnection;
+            /*
+            // Find 'mutually visible points in both polygons to make the cut
+            2. Intersect the ray M + t(1, 0) with all directed edges ⟨Vi, Vi+1⟩ of the outer polygon for which M is to the left of the line containing the edge (M is inside the outer polygon). Let I be the closest visible point to M on this ray.
+            3. If I is a vertex of the outer polygon, then M and I are mutually visible and the algorithm terminates.
+            4. Otherwise, I is an interior point of the edge ⟨Vi, Vi+1⟩. Select P to be the endpoint of maximum x-value
+            for this edge.
+            5. Search the reflex vertices of the outer polygon (not including P if it happens to be reflex). If all of these vertices are strictly outside triangle ⟨M,I,P⟩, then M and P are mutually visible and the algorithm terminates.
+            6. Otherwise, at least one reflex vertex lies in ⟨M,I,P⟩. Search for the reflex R that minimizes the angle between (1,0) and the line segment ⟨M,R⟩. Then M and R are mutually visible and the algorithm terminates. It is possible in this step that there are multiple reflex vertices that minimize the angle,
+            */
+
+            // 1. Search the inner polygon for vertex M of maximum x-value.
+            Vector2 maxInsideX = holePolygon.GetVertex( 0 );
+            int maxInsideXIdx = 0;
+            for ( int i = 1; i < holePolygon.NumVertices; i++ ) {
+                if ( holePolygon.GetVertex( i ).x > maxInsideX.x ) {
+                    maxInsideX = holePolygon.GetVertex( i );
+                    maxInsideXIdx = i;
+                }
+            }
+
+            // 2. Intersect the ray M + t(1, 0) with all directed edges ⟨Vi, Vi+1⟩ of the outer polygon for which M is to the left of the line containing the edge (M is inside the outer polygon). Let I be the closest visible point to M on this ray.
+            Vector2 closestIntersection = Vector2.zero;
+            bool isEnd = false;
+            float closestIntersectionDist = float.MaxValue;
+            int closestSegmentEnd = -1;
+            int closestVertex = -1;
+            for ( int i = 1; i < NumVertices; i++ ) {
+                Vector2 a = vertices[i - 1];
+                Vector2 b = vertices[i];
+                if ( a.x < maxInsideX.x && b.x < maxInsideX.x ) {
+                    // segment to left of hole
+                    continue;
+                }
+
+
+                Vector2 v1 = maxInsideX - a;
+                Vector2 v2 = b - a;
+                Vector2 v3 = new Vector2(0, 1);
+
+                float dot = v2.y;
+                if ( Mathf.Abs( dot ) < .00001f )
+                    continue;   // parallel to ray
+
+                float t1 = ( ( v2.x * v1.y ) - ( v2.y * v1.x ) ) / dot;
+                if ( t1 < 0 )
+                    continue;
+
+                float t2 = v1.y / dot;
+                if ( t2 >= 0.0 && t2 <= 1.0 ) {
+                    // intersection, is it the closest?
+                    if ( t1 < closestIntersectionDist ) {
+                        closestIntersection = new Vector2( maxInsideX.x + t1, maxInsideX.y );
+                        isEnd = t2 == 0 || t2 == 1;
+                        closestIntersectionDist = t1;
+                        closestSegmentEnd = i;
+                        closestVertex = t2 < 0.5 ? i - 1 : i;
+                    }
+                }
+            }
+
+            if ( closestSegmentEnd == -1 ) {
+                throw new ArgumentException( "no intersections from hole to outer polygon, is it inside?" );
+            }
+
+            innerConnection = maxInsideXIdx;
+
+            // 3. If I is a vertex of the outer polygon, then M and I are mutually visible and the algorithm terminates.
+            if ( isEnd ) {
+                outerConnection = closestVertex;
+            }
+            else {
+                // 4. Otherwise, I is an interior point of the edge ⟨Vi, Vi+1⟩. Select P to be the endpoint of maximum x-value
+                // for this edge.
+                int testVertex = closestSegmentEnd;
+                if ( vertices[testVertex].x < vertices[testVertex - 1].x ) {
+                    testVertex -= 1;    // previous vertex has higherr x
+                }
+
+                bool isOuterClockwise = IsClockwise;
+                // 5. Search the reflex vertices of the outer polygon (not including P if it happens to be reflex). If all of these vertices are strictly outside triangle ⟨M,I,P⟩, then M and P are mutually visible and the algorithm terminates.
+                // 6. Otherwise, at least one reflex vertex lies in ⟨M,I,P⟩. Search for the reflex R that minimizes the angle between (1,0) and the line segment ⟨M,R⟩. Then M and R are mutually visible and the algorithm terminates.
+                // 7 It is possible in this step that there are multiple reflex vertices that minimize the angle,in which case all of them lie on a ray with M as the origin. Choose the reflex vertex on this ray that is closest to M.
+                int vertWIthSmallestAngle = -1;
+                float smallestAngle = float.MaxValue;
+                for ( int i = 0; i < vertices.Count; i++ ) {
+                    if ( i == testVertex )
+                        continue;
+
+                    int nextVertex = ( i + 1 ) % NumVertices;
+                    int previousVertex = i == 0 ? NumVertices - 1 : i - 1;
+
+                    bool isNextToLeft = IsLeft( vertices[previousVertex], vertices[i], vertices[nextVertex] ) > 0;
+                    bool isReflex = isOuterClockwise == isNextToLeft;
+                    if ( !isReflex )
+                        continue;   // ignore non reflex
+
+                    Vector2 fromHole = vertices[i] - maxInsideX;
+                    float angleTo = Mathf.Atan2( fromHole.y, fromHole.x );
+                    angleTo = Mathf.Abs( angleTo );
+                    if ( vertWIthSmallestAngle == -1 || angleTo < smallestAngle || ( angleTo == smallestAngle && vertices[i].x < vertices[vertWIthSmallestAngle].x ) ) {
+                        vertWIthSmallestAngle = i;
+                        smallestAngle = angleTo;
+                    }
+                }
+
+                if ( vertWIthSmallestAngle == -1 ) {
+                    // stick with testVertex
+                    outerConnection = testVertex;
+                }
+                else {
+                    outerConnection = vertWIthSmallestAngle;
+                }
+            }
+
+            // oooooook, now we no where to cut the polygon, insert vertices to connect them
+            InsertVertex( outerConnection + 1, vertices[outerConnection] ); // suplicate outer hole
+
+            // add hole vertices
+            Vector2 startHole = Vector2.zero;
+            for ( int i = 0; i < holePolygon.NumVertices; i++ ) {
+                bool reverseHole = IsClockwise == holePolygon.IsClockwise;  // insert hole vertices in reverse direction of outer to keep it correct (eg if outer is clockwise, hole needs to be anticloskwise)
+                int holeVertIdx;
+                if ( reverseHole ) {
+                    holeVertIdx = innerConnection - 1;
+                    if ( holeVertIdx < 0 )
+                        holeVertIdx += holePolygon.NumVertices;
+                }
+                else
+                    holeVertIdx = ( innerConnection + i ) % holePolygon.NumVertices;
+
+                Vector2 holeVertex = holePolygon.GetVertex( holeVertIdx );
+                if ( i == 0 )
+                    startHole = holeVertex;
+                InsertVertex( outerConnection + 1 + i, holeVertex );
+            }
+            // then add start of hole again
+            InsertVertex( outerConnection + 1 + holePolygon.NumVertices, startHole );
+        }
+
+        #endregion
 
         System.Text.StringBuilder debugSb;
         public void PrintVertices() {
