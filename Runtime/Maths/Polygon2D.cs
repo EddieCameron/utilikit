@@ -181,6 +181,8 @@ namespace Utilikit {
             return point;
         }
 
+#region Intersections
+
         /// <summary>
         /// Test whether the given line segment intersects with any of the polygon edges
         /// </summary>
@@ -197,6 +199,32 @@ namespace Utilikit {
 
             return false;
         }
+
+        public bool DoesIntersectWithRect( Rect rect ) {
+            if ( !IsValid )
+                return false;
+
+            // https://stackoverflow.com/questions/7136547/method-to-detect-intersection-between-a-rectangle-and-a-polygon
+
+            // check if rect is fully inside poly or vice versa
+            if ( Contains( rect.min ) )
+                return true;
+
+            if ( rect.Contains( vertices[0] ) )
+                return true;
+
+            // otherwise if there is intersection, one of the rect lines must intersect the polygon edge
+            Vector2 a = rect.min;
+            Vector2 b = new Vector2( rect.xMin, rect.yMax );
+            Vector2 c = new Vector2( rect.xMax, rect.yMax );
+            Vector2 d = new Vector2( rect.xMax, rect.yMin );
+            return DoesIntersectWithLine( a, b ) ||
+                DoesIntersectWithLine( b, c ) ||
+                DoesIntersectWithLine( c, d ) ||
+                DoesIntersectWithLine( d, a );
+        }
+
+        #endregion
 
         /// <summary>
         /// Get the closest vertex in this polygon to the given point.

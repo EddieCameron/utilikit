@@ -48,6 +48,19 @@ namespace Utilikit {
         public static Vector2 RandomPointWithin( this Rect rect ) {
             return new Vector2( Random.Range( rect.xMin, rect.xMax ), Random.Range( rect.yMin, rect.yMax ) );
         }
+
+        /// <summary>
+        /// Whether the given rect is entirely contained within the first rect
+        /// </summary>
+        /// <param name="rectA"></param>
+        /// <param name="rectB"></param>
+        /// <returns></returns>
+        public static bool Contains( this Rect rectA, Rect rectB ) {
+            return rectA.xMin <= rectB.xMin &&
+                rectA.xMax >= rectB.xMax &&
+                rectA.yMin <= rectB.yMin &&
+                rectA.yMax >= rectB.yMax;
+        }
         #endregion
 
         #region Vectors

@@ -47,32 +47,29 @@ namespace Utilikit {
                                Mathf.CeilToInt( height / cellSize )];
         }
 
-        /// Return a lazy sequence of samples. You typically want to call this in a foreach loop, like so:
-        ///   foreach (Vector2 sample in sampler.Samples()) { ... }
-        public IEnumerable<Vector2> Samples( Func<Vector2, bool> filter = null ) {
+        public Vector2? Sample( Func<Vector2, bool> filter = null ) {
+            if ( activeSamples.Count == 0 ) {
+                // first sample, pick random spot
+                Vector2 startSample = new Vector2( Random.value * rect.width, Random.value * rect.height );
+                if ( filter != null ) {
+                    int attempts = k;
+                    while ( !filter( startSample ) ) {
+                        if ( attempts <= 0 )
+                            return null;
 
-            Vector2 startSample = new Vector2( Random.value * rect.width, Random.value * rect.height );
-            if ( filter != null ) {
-                int attempts = k;
-                while ( !filter( startSample ) ) {
-                    if ( attempts <= 0 )
-                        yield break;
-
-                    startSample = new Vector2( Random.value * rect.width, Random.value * rect.height );
-                    attempts--;
+                        startSample = new Vector2( Random.value * rect.width, Random.value * rect.height );
+                        attempts--;
+                    }
                 }
+                AddSample( startSample );
+                return startSample;
             }
-
-            // First sample is choosen randomly
-            yield return AddSample( startSample );
-            while ( activeSamples.Count > 0 ) {
-
+            else {
                 // Pick a random active sample
                 int i = (int)Random.value * activeSamples.Count;
                 Vector2 sample = activeSamples[i];
 
                 // Try `k` random candidates between [radius, 2 * radius] from that sample.
-                bool found = false;
                 for ( int j = 0; j < k; ++j ) {
 
                     float angle = 2 * Mathf.PI * Random.value;
@@ -82,17 +79,25 @@ namespace Utilikit {
                     // Accept candidates if it's inside the rect and farther than 2 * radius to any existing sample.
                     if ( rect.Contains( candidate ) && IsFarEnough( candidate ) &&
                         ( filter == null || filter( candidate ) ) ) {
-                        found = true;
-                        yield return AddSample( candidate );
-                        break;
+                        AddSample( candidate );
+                        return candidate;
                     }
                 }
 
                 // If we couldn't find a valid candidate after k attempts, remove this sample from the active samples queue
-                if ( !found ) {
-                    activeSamples[i] = activeSamples[activeSamples.Count - 1];
-                    activeSamples.RemoveAt( activeSamples.Count - 1 );
-                }
+                activeSamples[i] = activeSamples[activeSamples.Count - 1];
+                activeSamples.RemoveAt( activeSamples.Count - 1 );
+                return null;
+            }
+        }
+
+        /// Return a lazy sequence of samples. You typically want to call this in a foreach loop, like so:
+        ///   foreach (Vector2 sample in sampler.Samples()) { ... }
+        public IEnumerable<Vector2> Samples( Func<Vector2, bool> filter = null ) {
+            Vector2? next = Sample( filter );
+            while ( next.HasValue ) {
+                yield return next.Value;
+                next = Sample( filter );
             }
         }
 
@@ -122,11 +127,10 @@ namespace Utilikit {
         }
 
         /// Adds the sample to the active samples queue and the grid before returning it
-        private Vector2 AddSample( Vector2 sample ) {
+        private void AddSample( Vector2 sample ) {
             activeSamples.Add( sample );
             GridPos pos = new GridPos( sample, cellSize );
             grid[pos.x, pos.y] = sample;
-            return sample;
         }
 
         /// Helper struct to calculate the x and y indices of a sample in the grid
