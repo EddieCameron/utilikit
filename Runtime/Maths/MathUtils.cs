@@ -193,6 +193,18 @@ namespace Utilikit {
             return orientation > 0 ? 1 : -1;
         }
 
+        /// <summary>
+        /// Is a point to the left, right, or on, an infinite line passing between two points
+        /// > 0 : left of line
+        /// < 0 : right of line
+        /// == 0 : on line
+        /// </summary>
+        /// <returns></returns>
+        public static float IsLeft( Vector2 p0, Vector2 p1, Vector2 pTest ) {
+            return ( ( p1.x - p0.x ) * ( pTest.y - p0.y )
+                    - ( pTest.x - p0.x ) * ( p1.y - p0.y ) );
+        }
+
         #endregion
 
         #region Maths
