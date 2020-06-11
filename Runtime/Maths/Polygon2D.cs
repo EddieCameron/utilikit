@@ -42,11 +42,11 @@ namespace Utilikit {
             this.vertices = new List<Vector2>();
         }
 
-        public Polygon2D( ICollection<Vector2> vertices ) {
-            if ( vertices.Count < 3 )
+        public Polygon2D( IEnumerable<Vector2> vertices ) {
+            this.vertices = new List<Vector2>( vertices );
+            if ( this.vertices.Count < 3 )
                 throw new InvalidOperationException( "Need at least 3 vertices to make a polygon" );
 
-            this.vertices = new List<Vector2>( vertices );
         }
         public Polygon2D( Polygon2D other ) {
             this.vertices = new List<Vector2>( other.vertices );
@@ -98,8 +98,18 @@ namespace Utilikit {
             SetDirty();
         }
 
+        public void AddVertices( IEnumerable<Vector2> points ) {
+            vertices.AddRange( points );
+            SetDirty();
+        }
+
         public void RemoveVertex( int atIdx ) {
             vertices.RemoveAt( atIdx );
+            SetDirty();
+        }
+
+        public void Clear() {
+            vertices.Clear();
             SetDirty();
         }
 
