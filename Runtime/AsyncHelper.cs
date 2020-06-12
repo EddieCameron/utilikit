@@ -166,10 +166,16 @@ namespace Utilikit {
             timeSinceLastJob += UseScaledTime ? Time.deltaTime : Time.unscaledDeltaTime;
 
             if ( timeSinceLastJob >= thisJobInterval ) {
-                job?.Invoke();
 
-                timeSinceLastJob = 0;
-                thisJobInterval = Random.Range( _minTimeBetweenJobs, _maxTimeBetweenJobs );
+                try {
+                    job?.Invoke();
+                    timeSinceLastJob = 0;
+                    thisJobInterval = Random.Range( _minTimeBetweenJobs, _maxTimeBetweenJobs );
+                }
+                catch ( Exception e ) {
+                    Debug.LogError( "Error excecuting repeating job: " + e.Message );
+                    Stop();
+                }
             }
         }
 
