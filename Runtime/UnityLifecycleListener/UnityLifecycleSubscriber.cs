@@ -27,9 +27,9 @@ namespace Utilikit {
 
         static void SubscribeToUnityEvents() {
 #if UNITY_EDITOR
-            if ( !UnityEditor.EditorApplication.isPlaying ) {
-                UnityEditor.EditorApplication.update -= HandleUpdate;
-                UnityEditor.EditorApplication.update += HandleUpdate;
+            if ( !UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode ) {
+                UnityEditor.EditorApplication.update -= OnEditorUpdate;
+                UnityEditor.EditorApplication.update += OnEditorUpdate;
                 UnityEditor.EditorApplication.quitting -= HandleOnApplicationQuit;
                 UnityEditor.EditorApplication.quitting += HandleOnApplicationQuit;
             }
@@ -77,6 +77,15 @@ namespace Utilikit {
         void OnApplicationQuit() {
             HandleOnApplicationQuit();
         }
+
+#if UNITY_EDITOR
+        static void OnEditorUpdate() {
+            if ( UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode ) {
+                return;
+            }
+            HandleUpdate();
+        }
+#endif
     }
 
     public interface IUnityLifecycleListener {
