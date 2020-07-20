@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Linq;
 using UnityEngine.UI;
 using System;
+using UnityEngine.Profiling;
 
 namespace Utilikit {
     /// <summary>
@@ -48,41 +49,37 @@ namespace Utilikit {
             // make home screen
             var homeScreen = GetScreen( "" );
 
-            Assembly[] allAssemblies = System.AppDomain.CurrentDomain.GetAssemblies();
-            IEnumerable<Type> allTypes = allAssemblies.SelectMany( a => a.GetTypes() );
+            var allAssemblies = System.AppDomain.CurrentDomain.GetAssemblies()
+                .Where( a => a.Location.Contains( "ScriptAssemblies" ) );   // user assembly + packages
 
+            IEnumerable<Type> allTypes = allAssemblies.SelectMany( a => a.GetTypes() );
             IEnumerable<MethodInfo> staticMethods = allTypes.SelectMany( t => t.GetMethods( BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic ) );   // all static methods
             IEnumerable<PropertyInfo> staticProps = allTypes.SelectMany( t => t.GetProperties( BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic ) );   // all static methods
 
             // populate buttons
-            var consoleMethods = GetMethodsWithAttribute<DevConsoleButtonAttribute>( staticMethods ).ToArray();
-
-            for ( int i = 0; i < consoleMethods.Length; i++ ) {
-                var methodAttrs = consoleMethods[i];
+            var consoleMethods = GetMethodsWithAttribute<DevConsoleButtonAttribute>( staticMethods );
+            foreach ( var methodAttrs in consoleMethods ) {
                 DevConsoleButton newButton = CreateDevConsoleItem( devConsoleButtonPrefab, methodAttrs.attribute );
                 newButton.Init( methodAttrs.method, methodAttrs.attribute );
             }
 
             // populate toggles
-            var toggleProperties = GetPropertiesWithAttribute<DevConsoleToggleAttribute>( staticProps ).ToArray();
-            for ( int i = 0; i < toggleProperties.Length; i++ ) {
-                var toggleAttr = toggleProperties[i];
+            var toggleProperties = GetPropertiesWithAttribute<DevConsoleToggleAttribute>( staticProps );
+            foreach ( var toggleAttr in toggleProperties ) {
                 var toggle = CreateDevConsoleItem( devConsoleTogglePrefab, toggleAttr.attribute );
                 toggle.Init( toggleAttr.property, toggleAttr.attribute );
             }
 
             // populate int fields
-            var intFieldProps = GetPropertiesWithAttribute<DevConsoleIntFieldAttribute>( staticProps ).ToArray();
-            for ( int i = 0; i < intFieldProps.Length; i++ ) {
-                var intFieldAttr = intFieldProps[i];
+            var intFieldProps = GetPropertiesWithAttribute<DevConsoleIntFieldAttribute>( staticProps );
+            foreach ( var intFieldAttr in intFieldProps ) {
                 var intField = CreateDevConsoleItem( devConsoleIntField, intFieldAttr.attribute );
                 intField.Init( intFieldAttr.property, intFieldAttr.attribute );
             }
 
             // populate sliders
-            var sliderProperties = GetPropertiesWithAttribute<DevConsoleSliderAttribute>( staticProps ).ToArray();
-            for ( int i = 0; i < sliderProperties.Length; i++ ) {
-                var sliderAttr = sliderProperties[i];
+            var sliderProperties = GetPropertiesWithAttribute<DevConsoleSliderAttribute>( staticProps );
+            foreach ( var sliderAttr in sliderProperties ) {
                 var slider = CreateDevConsoleItem( devConsoleSliderPrefab, sliderAttr.attribute );
                 slider.Init( sliderAttr.property, sliderAttr.attribute );
             }
