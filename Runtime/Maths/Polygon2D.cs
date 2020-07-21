@@ -381,7 +381,6 @@ namespace Utilikit {
                 Vector2 a = vertices[v.Value];
                 Vector2 b = vertices[next.Value];
                 Vector2 c = vertices[previous.Value];
-                float? triangleArea = null;    // calculate lazily
                 foreach ( var r in reflexVertices ) {
                     if ( r == next || r == previous )
                         continue;   // don't look at triangle vertices

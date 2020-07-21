@@ -24,5 +24,10 @@ namespace Utilikit
 
             return count - 1;
         }
+
+        public static Vector2 OnUnitCircle() {
+            var angle = UnityEngine.Random.value * Mathf.PI * 2f;
+            return new Vector2( Mathf.Cos( angle ), Mathf.Sin( angle ) );
+        }
     }
 }

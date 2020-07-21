@@ -62,7 +62,7 @@ namespace Utilikit
         /// <param name="evaluateFunction"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static T FindHighest<T>( this IEnumerable<T> collection, Func<T, float> evaluateFunction ) {
+        public static T FindBestMatch<T>( this IEnumerable<T> collection, Func<T, float> evaluateFunction ) {
             T currentHighest = default( T );
             float currentHighestValue = float.MinValue;
             foreach (var item in collection)
