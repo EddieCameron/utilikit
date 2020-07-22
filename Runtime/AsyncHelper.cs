@@ -174,6 +174,7 @@ namespace Utilikit {
                 }
                 catch ( Exception e ) {
                     Debug.LogError( "Error excecuting repeating job: " + e.Message );
+                    Debug.LogException( e );
                     Stop();
                 }
             }
