@@ -12,7 +12,10 @@ public abstract class Flasher : MonoBehaviour
     public float flashTime = .2f;
     public AnimationCurve flashEase = AnimationCurve.Linear( 0, 0, 1, 1 );
 
+    [SerializeField]
     private bool isFlashing;
+
+    [SerializeField]
     private bool isRepeating;
     private Color targetColor;
     private float flashStartTime;
@@ -22,6 +25,8 @@ public abstract class Flasher : MonoBehaviour
     void Awake() {
         if ( setBaseColorOnStart )
             baseColor = ObjectColor;
+        targetColor = baseColor;
+        flashStartTime = Time.time;
     }
 
     void Update()
