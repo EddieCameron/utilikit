@@ -221,6 +221,23 @@ namespace Utilikit {
             else
                 return length * 2 - r;
         }
+
+        /// <summary>
+        /// Smoothly interpolate towards the given target.
+        /// A more predictable Mathf.Lerp(current, target, x * Time.deltaTime )
+        /// </summary>
+        /// <param name="current"></param>
+        /// <param name="target"></param>
+        /// <param name="rate"></param>
+        /// <returns></returns>
+        public static float SmoothLerpTowards( this float current, float target, float rate ) {
+            return SmoothLerpTowards( current, target, rate, Time.deltaTime );
+        }
+
+        public static float SmoothLerpTowards( this float current, float target, float rate, float deltaTime ) {
+            rate = Mathf.Pow( 2, rate );    // use log scale
+            return Mathf.Lerp( target, current, Mathf.Pow( 2, -rate * deltaTime ) );
+        }
         #endregion
     }
 }
