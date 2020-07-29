@@ -84,7 +84,7 @@ namespace Utilikit {
         /// <param name="t"></param>
         /// <returns></returns>
         public override Vector2 Interpolate( float t ) {
-            int numSegments = controlPoints.Length - 3;
+            int numSegments = controlPoints.Count - 3;
             float segmentAmount = 1f / numSegments;
             int segmentIdx = Mathf.Min( (int)( t * numSegments ), numSegments - 1 );
 

@@ -13,11 +13,11 @@ using Random = UnityEngine.Random;
 namespace Utilikit {
     public abstract class InterpolatedSpline {
 
-        protected Vector2[] controlPoints;
+        protected List<Vector2> controlPoints = new List<Vector2>();
 
         public virtual void SetControlPoints( ICollection<Vector2> controlPoints ) {
-            this.controlPoints = new Vector2[controlPoints.Count];
-            controlPoints.CopyTo( this.controlPoints, 0 );
+            this.controlPoints.Clear();
+            this.controlPoints.AddRange( controlPoints );
         }
 
         /// <summary>

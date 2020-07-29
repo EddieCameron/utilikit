@@ -135,12 +135,35 @@ namespace Utilikit {
             return false; // Doesn't fall in any of the above cases
         }
 
-
         /// <summary>
-        /// What is the shortest distance from a point on the given line to pTest
+        /// Find point where two infinite lines intersect.
+        /// Returns false if rays are parallel
         /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <param name="intersection"></param>
         /// <returns></returns>
-        public static float DistanceFromPointToLine( Vector2 p0, Vector2 p1, Vector2 pTest ) {
+        public static bool IntersectLines( Vector2 p1, Vector2 dir1, Vector2 p2, Vector2 dir2, out Vector2 intersection ) {
+            // https://stackoverflow.com/questions/2931573/determining-if-two-rays-intersect
+            float det = dir2.x * dir1.y - dir2.y * dir1.x;
+            if ( det == 0 ) {
+                intersection = Vector2.zero;
+                return false;   // parallel
+            }
+
+            float dx = p2.x - p1.x;
+            float dy = p2.y - p1.y;
+            float u = ( dy * dir2.x - dx * dir2.y ) / det;
+            intersection = p1 + dir1 * u;
+            return true;
+        }
+
+
+            /// <summary>
+            /// What is the shortest distance from a point on the given line to pTest
+            /// </summary>
+            /// <returns></returns>
+            public static float DistanceFromPointToLine( Vector2 p0, Vector2 p1, Vector2 pTest ) {
             // https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
             // Return minimum distance between line segment vw and point p
             float l2 = ( p1 - p0 ).sqrMagnitude;  // i.e. |w-v|^2 -  avoid a sqrt
