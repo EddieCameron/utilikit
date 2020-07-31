@@ -20,7 +20,6 @@ namespace Utilikit {
                 lastTap = tapTime;
             }
 #else
-    Debug.Log( Input.touchCount );
             if ( Input.touchCount >= 4 )
                 DevConsole.ShowDevConsole();
 #endif
