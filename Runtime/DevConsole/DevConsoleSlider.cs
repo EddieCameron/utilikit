@@ -11,7 +11,7 @@ namespace Utilikit {
     /// <summary>
     /// A slider value that can be changed from the dev console
     /// </summary>
-    public class DevConsoleSlider : MonoBehaviour {
+    public class DevConsoleSlider : DevConsoleUIElement<DevConsoleSliderAttribute> {
         public Text titleText;
         public Slider slider;
         public Text quantityText;
@@ -19,19 +19,14 @@ namespace Utilikit {
         protected Func<float> GetQuantityMethod;
         protected Action<float> SetQuantityMethod;
 
-        public void Init( string title ) {
-            titleText.text = title;
-            UpdateQuantity();
-        }
+        protected override void DoInit() {
+            GetQuantityMethod = () => (float)TargetProperty.GetValue( null, null );
+            SetQuantityMethod = newQuantity => TargetProperty.SetValue( null, newQuantity, null );
 
-        public void Init( PropertyInfo onProperty, DevConsoleSliderAttribute attr ) {
-            GetQuantityMethod = () => (float)onProperty.GetValue( null, null );
-            SetQuantityMethod = newQuantity => onProperty.SetValue( null, newQuantity, null );
+            titleText.text = Attribute.displayName;
 
-            titleText.text = attr.displayName;
-
-            slider.minValue = attr.min;
-            slider.maxValue = attr.max;
+            slider.minValue = Attribute.min;
+            slider.maxValue = Attribute.max;
             slider.onValueChanged.AddListener( delegate { OnQuantityFieldUpdated( slider.value ); } );
             UpdateQuantity();
         }

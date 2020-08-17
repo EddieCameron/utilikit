@@ -11,7 +11,7 @@ namespace Utilikit {
     /// <summary>
     /// An integer quantity that can be changed from the devconsole
     /// </summary>
-    public class DevConsoleIntField : MonoBehaviour {
+    public class DevConsoleIntField : DevConsoleUIElement<DevConsoleIntFieldAttribute> {
         public Text titleText;
         public InputField inputField;
 
@@ -21,16 +21,16 @@ namespace Utilikit {
         bool _allowNegative;
         private int _lastValue;
 
-        public void Init( PropertyInfo onProperty, DevConsoleIntFieldAttribute attr ) {
-            GetQuantityMethod = () => (int)onProperty.GetValue( null, null );
-            SetQuantityMethod = newQuantity => onProperty.SetValue( null, newQuantity, null );
+        protected override void DoInit() {
+            GetQuantityMethod = () => (int)TargetProperty.GetValue( null, null );
+            SetQuantityMethod = newQuantity => TargetProperty.SetValue( null, newQuantity, null );
 
-            titleText.text = attr.displayName;
+            titleText.text = Attribute.displayName;
 
             inputField.characterValidation = InputField.CharacterValidation.Integer;
             inputField.onEndEdit.AddListener( OnInputEntered );
 
-            _allowNegative = attr.allowNegative;
+            _allowNegative = Attribute.allowNegative;
 
             UpdateQuantity();
         }

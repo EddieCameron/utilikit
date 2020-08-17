@@ -13,17 +13,11 @@ namespace Utilikit {
     /// <summary>
     /// Devconsole button
     /// </summary>
-    public class DevConsoleButton : MonoBehaviour {
+    public class DevConsoleButton : DevConsoleUIElement<DevConsoleButtonAttribute> {
         public Text text;
 
-        public DevConsoleAttribute MethodAttribute { get; set; }
-        public MethodInfo Method { get; set; }
-
-        public void Init( MethodInfo methodInfo, DevConsoleAttribute attribute ) {
-            this.Method = methodInfo;
-            this.MethodAttribute = attribute;
-
-            text.text = attribute.displayName;
+        protected override void DoInit() {
+            text.text = Attribute.displayName;
         }
 
         void OnEnable() {
@@ -35,7 +29,7 @@ namespace Utilikit {
         }
 
         protected void OnButtonClicked() {
-            Method.Invoke( null, null ); // all console methods are static
+            TargetMethod.Invoke( null, null ); // all console methods are static
         }
     }
 }

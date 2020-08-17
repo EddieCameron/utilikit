@@ -59,50 +59,56 @@ namespace Utilikit {
             // populate buttons
             var consoleMethods = GetMethodsWithAttribute<DevConsoleButtonAttribute>( staticMethods );
             foreach ( var methodAttrs in consoleMethods ) {
-                DevConsoleButton newButton = CreateDevConsoleItem( devConsoleButtonPrefab, methodAttrs.attribute );
-                newButton.Init( methodAttrs.method, methodAttrs.attribute );
+                DevConsoleButton newButton = CreateDevConsoleItem( devConsoleButtonPrefab, methodAttrs.attribute, methodAttrs.method );
             }
 
             // populate toggles
             var toggleProperties = GetPropertiesWithAttribute<DevConsoleToggleAttribute>( staticProps );
             foreach ( var toggleAttr in toggleProperties ) {
-                var toggle = CreateDevConsoleItem( devConsoleTogglePrefab, toggleAttr.attribute );
-                toggle.Init( toggleAttr.property, toggleAttr.attribute );
+                var toggle = CreateDevConsoleItem( devConsoleTogglePrefab, toggleAttr.attribute, toggleAttr.property );
             }
 
             // populate int fields
             var intFieldProps = GetPropertiesWithAttribute<DevConsoleIntFieldAttribute>( staticProps );
             foreach ( var intFieldAttr in intFieldProps ) {
-                var intField = CreateDevConsoleItem( devConsoleIntField, intFieldAttr.attribute );
-                intField.Init( intFieldAttr.property, intFieldAttr.attribute );
+                var intField = CreateDevConsoleItem( devConsoleIntField, intFieldAttr.attribute, intFieldAttr.property );
             }
 
             // populate sliders
             var sliderProperties = GetPropertiesWithAttribute<DevConsoleSliderAttribute>( staticProps );
             foreach ( var sliderAttr in sliderProperties ) {
-                var slider = CreateDevConsoleItem( devConsoleSliderPrefab, sliderAttr.attribute );
-                slider.Init( sliderAttr.property, sliderAttr.attribute );
+                var slider = CreateDevConsoleItem( devConsoleSliderPrefab, sliderAttr.attribute, sliderAttr.property );
             }
         }
 
         private IEnumerable<(MethodInfo method, TAttributeType attribute)> GetMethodsWithAttribute<TAttributeType>( IEnumerable<MethodInfo> methods ) where TAttributeType : DevConsoleAttribute {
             return methods
-                .Select( method => (method, attributes: method.GetCustomAttributes<TAttributeType>( false )) )      // all attributes
-                .Where( pa => pa.attributes.Count() > 0 )                                                                        // throw out the non-testing console things
-                .Select( pa => (pa.method, pa.attributes.First()) );
+                .Select( method => (method, attribute: method.GetCustomAttribute<TAttributeType>( false )) )      // all attributes
+                .Where( pa => pa.attribute != null );
         }
 
         private IEnumerable<(PropertyInfo property, TAttributeType attribute)> GetPropertiesWithAttribute<TAttributeType>( IEnumerable<PropertyInfo> properties ) where TAttributeType : DevConsoleAttribute {
             return properties
-                .Select( property => (property, attributes: property.GetCustomAttributes<TAttributeType>( false )) )      // all attributes
-                .Where( pa => pa.attributes.Count() > 0 )                                                                        // throw out the non-testing console things
-                .Select( pa => (pa.property, pa.attributes.First()) );
+                .Select( property => (property, attribute: property.GetCustomAttribute<TAttributeType>( false )) )      // all attributes
+                .Where( pa => pa.attribute != null );                                                                        // throw out the non-testing console things
         }
 
-        private T CreateDevConsoleItem<T>( T itemPrefab, DevConsoleAttribute attr ) where T : Component {
+        private TUiElement CreateDevConsoleItem<TUiElement, TAttribute>( TUiElement itemPrefab, TAttribute attr, PropertyInfo property ) where TAttribute : DevConsoleAttribute where TUiElement : DevConsoleUIElement<TAttribute> {
             var onScreen = GetScreen( attr.screen );
             var item = Instantiate( itemPrefab, onScreen.controlRoot );
             item.transform.localScale = Vector3.one;
+
+            item.Init( attr, targetProperty: property );
+            return item;
+        }
+
+
+        private TUiElement CreateDevConsoleItem<TUiElement, TAttribute>( TUiElement itemPrefab, TAttribute attr, MethodInfo method ) where TAttribute : DevConsoleAttribute where TUiElement : DevConsoleUIElement<TAttribute> {
+            var onScreen = GetScreen( attr.screen );
+            var item = Instantiate( itemPrefab, onScreen.controlRoot );
+            item.transform.localScale = Vector3.one;
+
+            item.Init( attr, method );
             return item;
         }
 

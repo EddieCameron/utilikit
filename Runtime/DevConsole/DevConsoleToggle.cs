@@ -14,18 +14,18 @@ namespace Utilikit {
     /// <summary>
     /// Devconsole toggle for a boolean prop
     /// </summary>
-    public class DevConsoleToggle : MonoBehaviour {
+    public class DevConsoleToggle : DevConsoleUIElement<DevConsoleToggleAttribute> {
         public Text text;
         public Toggle toggle;
 
         protected Func<bool> GetMethod;
         protected Action<bool> SetMethod;
 
-        public void Init( PropertyInfo propertyInfo, DevConsoleAttribute attribute ) {
-            GetMethod = () => (bool)propertyInfo.GetValue( null, null );
-            SetMethod = newQuantity => propertyInfo.SetValue( null, newQuantity, null );
+        protected override void DoInit() {
+            GetMethod = () => (bool)TargetProperty.GetValue( null, null );
+            SetMethod = newQuantity => TargetProperty.SetValue( null, newQuantity, null );
 
-            text.text = attribute.displayName;
+            text.text = Attribute.displayName;
             toggle.onValueChanged.AddListener( OnToggled );
 
             UpdateToggle();
