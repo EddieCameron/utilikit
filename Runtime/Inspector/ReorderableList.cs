@@ -11,7 +11,7 @@ using Random = UnityEngine.Random;
 
 namespace Utilikit {
     [Serializable]
-    public abstract class ReorderableList<T> : IList<T> {
+    public class ReorderableList<T> : IList<T> {
         [SerializeField]
         private List<T> _list;
 
