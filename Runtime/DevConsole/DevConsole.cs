@@ -49,8 +49,11 @@ namespace Utilikit {
             // make home screen
             var homeScreen = GetScreen( "" );
 
-            var allAssemblies = System.AppDomain.CurrentDomain.GetAssemblies()
-                .Where( a => a.Location.Contains( "ScriptAssemblies" ) );   // user assembly + packages
+#if UNITY_EDITOR
+            var allAssemblies = System.AppDomain.CurrentDomain.GetAssemblies().Where( a => a.Location.Contains( "ScriptAssemblies" ) );   // user assembly + packages
+#else
+            var allAssemblies = System.AppDomain.CurrentDomain.GetAssemblies().Where( a => !a.Location.StartsWith( "System" ) && !a.Location.StartsWith( "UnityEngine" ) );   // user assembly + packages
+#endif
 
             IEnumerable<Type> allTypes = allAssemblies.SelectMany( a => a.GetTypes() );
             IEnumerable<MethodInfo> staticMethods = allTypes.SelectMany( t => t.GetMethods( BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic ) );   // all static methods
