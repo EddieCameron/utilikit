@@ -107,6 +107,22 @@ namespace Utilikit {
         /// </summary>
         /// <param name="angleDegrees"></param>
         /// <returns></returns>
+        public static Vector2 Rotate( this Vector2 v, float degrees ) {
+            float radians = degrees * Mathf.Deg2Rad;
+            float sin = Mathf.Sin( radians );
+            float cos = Mathf.Cos( radians );
+
+            float tx = v.x;
+            float ty = v.y;
+
+            return new Vector2( cos * tx - sin * ty, sin * tx + cos * ty );
+        }
+
+        /// <summary>
+        /// Create a unit vector that is rotated the given degrees anticlockwise from (1,0)
+        /// </summary>
+        /// <param name="angleDegrees"></param>
+        /// <returns></returns>
         public static Vector2 GetAngleVector( float angleDegrees ) {
             float rad = angleDegrees * Mathf.Deg2Rad;
             return new Vector2( Mathf.Cos( rad ), Mathf.Sin( rad ) );
