@@ -19,7 +19,7 @@ namespace Utilikit
         static Dictionary<string, GameObjectPoolGroup> _poolGroups = new Dictionary<string, GameObjectPoolGroup>();
         static Transform _despawnParent = null;
 
-        [RuntimeInitializeOnLoadMethod]
+        [RuntimeInitializeOnLoadMethod( RuntimeInitializeLoadType.SubsystemRegistration )]
         static void Init() {
             _poolGroups.Clear();
             if ( _despawnParent != null ) {
