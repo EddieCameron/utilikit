@@ -17,7 +17,6 @@ namespace Utilikit {
         [Serializable]
         public class TriggerUnityEvent : UnityEngine.Events.UnityEvent<Collider2D> { }
         public TriggerUnityEvent TriggerEntered = new TriggerUnityEvent();
-        public TriggerUnityEvent TriggerStay = new TriggerUnityEvent();
         public TriggerUnityEvent TriggerLeft = new TriggerUnityEvent();
 
         /// <summary>
@@ -47,17 +46,6 @@ namespace Utilikit {
                 collidersWithin.TryAddUnique( other );
 
                 TriggerEntered?.Invoke( other );
-            }
-        }
-
-        void OnTriggerStay2D( Collider2D other ) {
-            if ( !enabled )
-                return;
-
-            if ( ( ( 1 << other.gameObject.layer ) & layerMask.value ) != 0 ) {
-                collidersWithin.TryAddUnique( other );
-
-                TriggerStay?.Invoke( other );
             }
         }
 
