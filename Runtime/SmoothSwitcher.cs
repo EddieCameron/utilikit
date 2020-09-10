@@ -61,6 +61,12 @@ namespace Utilikit {
         float t;
         System.Action<bool> currentSwitchCompletedCallback;
 
+
+        [System.Serializable]
+        public class SwitchAmountSetEvent : UnityEvent<float> { }
+
+        public SwitchAmountSetEvent OnValueChanged = new SwitchAmountSetEvent();
+
         protected void Awake() {
             State = _startOn ? SwitchState.On : SwitchState.Off;
             SwitchValue = t = _startOn ? 1 : 0;
@@ -80,6 +86,7 @@ namespace Utilikit {
                 else {
                     SwitchValue = EasingFunction.GetEasingFunction( easeType )( 0, 1, t );
                 }
+                OnValueChanged?.Invoke( SwitchValue );
             }
             else if ( State == SwitchState.SwitchingOff ) {
                 t -= Time.deltaTime / switchTime;
@@ -94,6 +101,7 @@ namespace Utilikit {
                 else {
                     SwitchValue = EasingFunction.GetEasingFunction( easeType )( 0, 1, t );
                 }
+                OnValueChanged?.Invoke( SwitchValue );
             }
         }
 
