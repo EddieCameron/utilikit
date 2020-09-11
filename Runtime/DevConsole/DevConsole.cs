@@ -50,9 +50,9 @@ namespace Utilikit {
             var homeScreen = GetScreen( "" );
 
 #if UNITY_EDITOR
-            var allAssemblies = System.AppDomain.CurrentDomain.GetAssemblies().Where( a => a.Location.Contains( "ScriptAssemblies" ) );   // user assembly + packages
+            var allAssemblies = System.AppDomain.CurrentDomain.GetAssemblies().Where( a => !a.IsDynamic && a.Location.Contains( "ScriptAssemblies" ) );   // user assembly + packages
 #else
-            var allAssemblies = System.AppDomain.CurrentDomain.GetAssemblies().Where( a => !a.Location.StartsWith( "System" ) && !a.Location.StartsWith( "UnityEngine" ) );   // user assembly + packages
+            var allAssemblies = System.AppDomain.CurrentDomain.GetAssemblies().Where( a => !a.IsDynamic && !a.Location.StartsWith( "System" ) && !a.Location.StartsWith( "UnityEngine" ) );   // user assembly + packages
 #endif
 
             IEnumerable<Type> allTypes = allAssemblies.SelectMany( a => a.GetTypes() );
