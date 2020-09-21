@@ -14,6 +14,7 @@ namespace Utilikit {
 
         HashSet<Collider> collidersWithin = new HashSet<Collider>();
 
+        [Serializable]
         public class TriggerUnityEvent : UnityEngine.Events.UnityEvent<Collider> { }
         public TriggerUnityEvent TriggerEntered, TriggerStay, TriggerLeft;
 
