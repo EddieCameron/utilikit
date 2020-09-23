@@ -17,9 +17,6 @@ namespace Utilikit {
             }
         }
 
-        public delegate void InventoryChangedEvent( string modifiedItemId, int newItemQuantity, int change );
-        public event InventoryChangedEvent ItemChanged;
-
 #if UNITY_EDITOR
         // for domain reloading
         [RuntimeInitializeOnLoadMethod( RuntimeInitializeLoadType.SubsystemRegistration )]
@@ -28,6 +25,9 @@ namespace Utilikit {
         }
 #endif
         #endregion
+
+        public delegate void InventoryChangedEvent( string modifiedItemId, int newItemQuantity, int change );
+        public event InventoryChangedEvent ItemChanged;
 
         Dictionary<string, int> _inventoryQuantities = new Dictionary<string, int>();
 
@@ -122,6 +122,10 @@ namespace Utilikit {
             return new Record( _inventoryQuantities );
         }
 
+        public void FillRecord( Record record ) {
+            record.SetInventory( _inventoryQuantities );
+        }
+
         [Serializable]
         public struct Quantity {
             public string itemId;
@@ -135,14 +139,16 @@ namespace Utilikit {
 
         [Serializable]
         public class Record {
-            public Quantity[] inventoryContents;
+            public List<Quantity> inventoryContents = new List<Quantity>();
 
             public Record( IDictionary<string, int> inventoryDict ) {
-                inventoryContents = new Quantity[inventoryDict.Count];
-                int i = 0;
+                SetInventory( inventoryDict );
+            }
+
+            public void SetInventory( IDictionary<string, int> inventoryDict ) {
+                inventoryContents.Clear();
                 foreach ( var item in inventoryDict ) {
-                    inventoryContents[i] = new Quantity( item.Key, item.Value );
-                    i++;
+                    inventoryContents.Add( new Quantity( item.Key, item.Value ) );
                 }
             }
         }
