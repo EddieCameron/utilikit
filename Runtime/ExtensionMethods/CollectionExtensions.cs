@@ -5,8 +5,7 @@ using System.Collections.Generic;
 
 namespace Utilikit
 {
-    public static class CollectionExtensions
-    {
+    public static class CollectionExtensions {
         /// <summary>
         /// Transform a collection into an array of the same length, running a function on each element
         /// </summary>
@@ -15,13 +14,11 @@ namespace Utilikit
         /// <typeparam name="TIn"></typeparam>
         /// <typeparam name="TOut"></typeparam>
         /// <returns></returns>
-        public static TOut[] Map<TIn, TOut>( this IList<TIn> list, Func<TIn, TOut> mapFunction )
-        {
+        public static TOut[] Map<TIn, TOut>( this IList<TIn> list, Func<TIn, TOut> mapFunction ) {
             int listCount = list.Count;
             var outArray = new TOut[listCount];
-            for (int i = 0; i < listCount; i++)
-            {
-                outArray[i] = mapFunction(list[i]);
+            for ( int i = 0; i < listCount; i++ ) {
+                outArray[i] = mapFunction( list[i] );
             }
             return outArray;
         }
@@ -65,8 +62,7 @@ namespace Utilikit
         public static T FindBestMatch<T>( this IEnumerable<T> collection, Func<T, float> evaluateFunction ) {
             T currentHighest = default( T );
             float currentHighestValue = float.MinValue;
-            foreach (var item in collection)
-            {
+            foreach ( var item in collection ) {
                 float itemEvaluatedValue = evaluateFunction( item );
                 if ( itemEvaluatedValue > currentHighestValue ) {
                     currentHighest = item;
@@ -74,6 +70,24 @@ namespace Utilikit
                 }
             }
             return currentHighest;
+        }
+
+
+        /// <summary>
+        /// Inplace fisher-yates shuffle of a list
+        /// </summary>
+        /// <param name="list"></param>
+        /// <typeparam name="T"></typeparam>
+        public static void Shuffle<T>( this IList<T> list ) {
+            var rng = new System.Random();
+            int n = list.Count;
+            while ( n > 1 ) {
+                n--;
+                int k = rng.Next( n + 1 );
+                T value = list[k];
+                list[k] = list[n];
+                list[n] = value;
+            }
         }
     }
 }

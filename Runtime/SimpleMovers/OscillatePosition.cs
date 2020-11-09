@@ -25,9 +25,13 @@ namespace Utilikit {
 
         public float Value { get; private set; }
 
+        public bool addLocalPositionOffsetFromStart = false;
+        Vector3 startPos;
+
 
         void Start() {
             t = offset;
+            startPos = transform.localPosition;
             UpdateValue();
         }
 
@@ -47,6 +51,9 @@ namespace Utilikit {
 
             Vector3 pos = transform.localPosition;
             pos[(int)axis] = Value;
+            if ( addLocalPositionOffsetFromStart ) {
+                pos += startPos;
+            }
             transform.localPosition = pos;
         }
     }
