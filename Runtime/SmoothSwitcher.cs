@@ -91,7 +91,7 @@ namespace Utilikit {
             else if ( State == SwitchState.SwitchingOff ) {
                 t -= Time.deltaTime / switchTime;
                 if ( t <= 0 ) {
-                    // switched on
+                    // switched off
                     State = SwitchState.Off;
                     SwitchValue = t = 0;
 
@@ -180,12 +180,43 @@ namespace Utilikit {
             }
         }
 
-        public async void SwitchOn() {
-            await SwitchOnAsync();
+        public async void SwitchOn( bool isInstant = false ) {
+            if ( isInstant ) {
+                if ( State == SwitchState.SwitchingOff ) {
+                    // switch off fail
+                    currentSwitchCompletedCallback?.Invoke( false );
+                    currentSwitchCompletedCallback = null;
+                }
+
+                // switched on
+                State = SwitchState.On;
+                SwitchValue = t = 1;
+
+                currentSwitchCompletedCallback?.Invoke( true );
+                currentSwitchCompletedCallback = null;
+            }
+            else {
+                await SwitchOnAsync();
+            }
         }
 
-        public async void SwitchOff() {
-            await SwitchOffAsync();
+        public async void SwitchOff( bool isInstant = false ) {
+            if ( isInstant ) {
+                if ( State == SwitchState.SwitchingOn ) {
+                    // switch on fail
+                    currentSwitchCompletedCallback?.Invoke( false );
+                    currentSwitchCompletedCallback = null;
+                }
+                // switched off
+                State = SwitchState.Off;
+                SwitchValue = t = 0;
+
+                currentSwitchCompletedCallback?.Invoke( true );
+                currentSwitchCompletedCallback = null;
+            }
+            else {
+                await SwitchOffAsync();
+            }
         }
 
         public async void Toggle() {
