@@ -40,6 +40,24 @@ namespace Utilikit
         }
 
         /// <summary>
+        /// Only add the given item if it doesn't already exist.
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <param name="element"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns>True if all elements were added, false if at least one was not</returns>
+        public static bool AddRangeUnique<T>( this ICollection<T> collection, IEnumerable<T> rangeToAdd ) {
+            bool allAdded = true;
+            foreach ( var element in rangeToAdd ) {
+                if ( collection.Contains( element ) )
+                    allAdded = false;
+                else
+                    collection.Add( element );
+            }
+            return allAdded;
+        }
+
+        /// <summary>
         /// Get a random element from a non-empty list/array
         /// </summary>
         /// <param name="collection"></param>
