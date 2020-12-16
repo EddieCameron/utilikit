@@ -144,6 +144,9 @@ namespace Utilikit {
             public Record( IDictionary<string, int> inventoryDict ) {
                 SetInventory( inventoryDict );
             }
+            public Record( IEnumerable<Quantity> quantities ) {
+                inventoryContents.AddRange( quantities );
+            }
 
             public void SetInventory( IDictionary<string, int> inventoryDict ) {
                 inventoryContents.Clear();

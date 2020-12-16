@@ -11,6 +11,7 @@ using Utilikit;
 using Random = UnityEngine.Random;
 using UnityEditor;
 using System.Linq;
+using System.Reflection;
 
 [CustomPropertyDrawer( typeof( DropdownAttribute ))]
 public class DropdownDrawer : PropertyDrawer {
@@ -31,7 +32,11 @@ public class DropdownDrawer : PropertyDrawer {
             }
         }
 
-        var getOptionsMethod = staticType.GetMethod( dropdownAttr.staticMethodName, System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public );
+        var getOptionsMethod = staticType.GetMethod( dropdownAttr.staticMethodName, BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public );
+        if ( getOptionsMethod == null ) {
+            // try getting property
+            getOptionsMethod = staticType.GetProperty( dropdownAttr.staticMethodName, BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public )?.GetMethod;
+        }
         if ( getOptionsMethod == null ) {
             Debug.LogError( "Get dropdown options method not found: " + dropdownAttr.staticMethodName );
             return;
