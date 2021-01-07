@@ -166,4 +166,24 @@ public static class ComponentExtensions {
         parent.gameObject.GetComponentsInParentsWithInterface<T>( listToFill );
     }
     #endregion
+
+    #region TryGet
+    public static bool TryGetComponentInParent<T>( this GameObject gameObject, out T componentInstance ) where T : Component {
+        if ( gameObject.TryGetComponent<T>( out componentInstance ) ) {
+            return true;
+        }
+
+        // if we're the root, no components have type T
+        Transform parent = gameObject.transform.parent;
+        if ( parent == null )
+            return false;
+
+        // otherwise recurse through parents
+        return parent.gameObject.TryGetComponentInParent<T>( out componentInstance );
+    }
+
+    public static bool TryGetComponentInParent<T>( this Component component, out T componentInstance ) where T : Component {
+        return component.gameObject.TryGetComponentInParent( out componentInstance );
+    }
+    #endregion
 }
