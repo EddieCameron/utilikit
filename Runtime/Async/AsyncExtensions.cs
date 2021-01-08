@@ -14,7 +14,7 @@ namespace Utilikit {
 
         public static TaskAwaiter<AsyncOperation> GetAwaiter( this AsyncOperation asyncOperation ) {
             var tcs = new TaskCompletionSource<AsyncOperation>();
-            if ( asyncOperation.isDone ) {
+            if ( asyncOperation == null || asyncOperation.isDone ) {
                 tcs.TrySetResult( asyncOperation );
             }
             else {
