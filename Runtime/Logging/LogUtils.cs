@@ -12,7 +12,7 @@ using Utilikit;
 using Random = UnityEngine.Random;
 
 namespace Utilikit {
-    public static class Logger {
+    public static class LogUtils {
         static StringBuilder _sb = new StringBuilder();
         public static string GetLogString( this IEnumerable collection ) {
             _sb.Clear();
@@ -42,6 +42,10 @@ namespace Utilikit {
             }
             _sb.Append( "]" );
             return _sb.ToString();
+        }
+
+        public static void LogColor( string log, Color color, UnityEngine.Object context = null ) {
+            Debug.Log( $"<color=\"#{ColorUtility.ToHtmlStringRGB( color )}\">{log}</color>", context );
         }
     }
 }

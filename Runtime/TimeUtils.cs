@@ -5,6 +5,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
 using UnityEngine.UI;
 using Utilikit;
@@ -42,7 +43,7 @@ namespace Utilikit {
         }
 
         void ISerializationCallbackReceiver.OnAfterDeserialize() {
-            if ( DateTime.TryParse( timeString, out DateTime parsedTime ) ) {
+            if ( DateTime.TryParse( timeString, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal,  out DateTime parsedTime ) ) {
                 this._time = parsedTime;
                 this.IsValid = true;
             }
