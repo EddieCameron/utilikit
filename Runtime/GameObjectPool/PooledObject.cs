@@ -10,6 +10,7 @@ namespace Utilikit {
 
         public bool WasSpawnedFromPool => SourcePool != null;
 
+        public event Action<PooledObject> IsDespawning;
         public event Action<PooledObject> DidSpawn;
         public event Action<PooledObject> DidDespawn;
 
@@ -31,6 +32,9 @@ namespace Utilikit {
 
             if ( !WasSpawnedFromPool )
                 throw new InvalidOperationException( "Tried to return a gameobject to a pool, but it didn't come from one" );
+
+            isDespawning = true;
+            IsDespawning?.Invoke( this );
 
             SourcePool.Despawn( this );
             SourcePool = null;
