@@ -93,10 +93,12 @@ namespace Utilikit
                 if ( _despawnParent == null ) {
                     // create base object to hold all despawned objects
                     _despawnParent = new GameObject( "Pooled Objects" ).transform;
+                    GameObject.DontDestroyOnLoad( _despawnParent.gameObject );
                 }
 
                 Transform groupParent = new GameObject( groupName ).transform;
                 groupParent.SetParent( _despawnParent );
+
                 group = new GameObjectPoolGroup( groupName, groupParent );
                 _poolGroups[groupName] = group;
             }
