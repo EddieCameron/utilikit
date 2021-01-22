@@ -42,7 +42,7 @@ using System;
 namespace Utilikit {
     public class SmoothSwitcher : MonoBehaviour {
         public float switchTime;
-        public EasingFunction.Ease easeType;
+        public Easing.Ease easeType;
 
         public enum SwitchState {
             Off,
@@ -84,7 +84,7 @@ namespace Utilikit {
                     currentSwitchCompletedCallback = null;
                 }
                 else {
-                    SwitchValue = EasingFunction.GetEasingFunction( easeType )( 0, 1, t );
+                    SwitchValue = Easing.GetEasingFunction( easeType )( 0, 1, t );
                 }
                 OnValueChanged?.Invoke( SwitchValue );
             }
@@ -99,7 +99,7 @@ namespace Utilikit {
                     currentSwitchCompletedCallback = null;
                 }
                 else {
-                    SwitchValue = EasingFunction.GetEasingFunction( easeType )( 0, 1, t );
+                    SwitchValue = Easing.GetEasingFunction( easeType )( 0, 1, t );
                 }
                 OnValueChanged?.Invoke( SwitchValue );
             }

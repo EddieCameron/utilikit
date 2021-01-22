@@ -59,7 +59,7 @@ using System;
 using UnityEngine;
 
 namespace Utilikit {
-    public static class EasingFunction {
+    public static class Easing {
         public enum Ease {
             EaseInQuad = 0,
             EaseOutQuad,
