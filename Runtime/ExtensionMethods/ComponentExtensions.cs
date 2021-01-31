@@ -185,5 +185,32 @@ public static class ComponentExtensions {
     public static bool TryGetComponentInParent<T>( this Component component, out T componentInstance ) where T : Component {
         return component.gameObject.TryGetComponentInParent( out componentInstance );
     }
+
+    /// <summary>
+    /// Like GetComponentInParent, but returns a script component that implements a given interface
+    /// </summary>
+    /// <returns>The first found component with interface T.</returns>
+    /// <typeparam name="T">The interface type to look for</typeparam>
+    public static bool TryGetComponentInParentWithInterface<T>( this GameObject gameObject, out T interfaceInstance ) where T : class {
+        if ( TryGetComponentWithInterface<T>( gameObject, out interfaceInstance ) )
+            return true;
+
+        // if we're the root, no components have type T
+        Transform parent = gameObject.transform.parent;
+        if ( parent == null )
+            return false;
+
+        // otherwise recurse through parents
+        return parent.gameObject.TryGetComponentInParentWithInterface<T>( out interfaceInstance );
+    }
+
+    /// <summary>
+    /// Like GetComponentInParent, but returns a script component that implements a given interface
+    /// </summary>
+    /// <returns>The first found component with interface T.</returns>
+    /// <typeparam name="T">The interface type to look for</typeparam>
+    public static bool TryGetComponentInParentWithInterface<T>( this Component component, out T interfaceInstance ) where T : class {
+        return component.gameObject.TryGetComponentInParentWithInterface<T>( out interfaceInstance );
+    }
     #endregion
 }
