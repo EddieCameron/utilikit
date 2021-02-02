@@ -35,13 +35,7 @@ namespace Utilikit {
                             Debug.Log( "Saved " + FileName + " instance" );
                         }
 
-                        if ( EditorApplication.isPlayingOrWillChangePlaymode ) {
-                            // delay to avoid crashing during Awake()
-                            EditorApplication.delayCall += () => SaveScriptableObjectAsset( _instance );
-                        }
-                        else {
-                            SaveScriptableObjectAsset( _instance );
-                        }
+                        SaveScriptableObjectAsset( _instance );
 #else
                     Debug.LogError("No instance of Static Scriptable found: " + FileName);
 #endif

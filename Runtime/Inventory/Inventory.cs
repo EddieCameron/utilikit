@@ -106,8 +106,10 @@ namespace Utilikit {
         public void LoadDefaultContents() {
             // Pre-fill inventory
             _inventoryQuantities.Clear();
-            foreach ( var quantity in InventoryConfig.Instance.initialQuantities ) {
-                _inventoryQuantities[quantity.itemId] = quantity.quantity;
+            if ( InventoryConfig.Instance?.initialQuantities != null ) {
+                foreach ( var quantity in InventoryConfig.Instance.initialQuantities ) {
+                    _inventoryQuantities[quantity.itemId] = quantity.quantity;
+                }
             }
         }
 
