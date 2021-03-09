@@ -43,7 +43,12 @@ namespace Utilikit {
         }
 
         void ISerializationCallbackReceiver.OnAfterDeserialize() {
-            if ( DateTime.TryParse( timeString, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal,  out DateTime parsedTime ) ) {
+            if ( string.IsNullOrEmpty( timeString ) ) {
+                // no saved infos
+                this._time = default( DateTime );
+                this.IsValid = false;
+            }
+            else if ( DateTime.TryParse( timeString, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal,  out DateTime parsedTime ) ) {
                 this._time = parsedTime;
                 this.IsValid = true;
             }
