@@ -62,4 +62,33 @@ namespace Utilikit {
         public static implicit operator DateTime(SerializableDateTime d) => d.Time;
         public static implicit operator SerializableDateTime(DateTime d) => new SerializableDateTime( d );
     }
+    [Serializable]
+    public struct SerializableTimeSpan : ISerializationCallbackReceiver {
+        [SerializeField]
+        long _spanTicks; // string so you can read it
+
+        TimeSpan _time;
+        public TimeSpan Time {
+            get => _time;
+            set {
+                _time = value;
+            }
+        }
+
+        public SerializableTimeSpan( TimeSpan time ) {
+            this._time = time;
+            this._spanTicks = time.Ticks;
+        }
+
+        void ISerializationCallbackReceiver.OnBeforeSerialize() {
+            _spanTicks = _time.Ticks;
+        }
+
+        void ISerializationCallbackReceiver.OnAfterDeserialize() {
+            this._time = new TimeSpan( _spanTicks );
+        }
+
+        public static implicit operator TimeSpan(SerializableTimeSpan d) => d.Time;
+        public static implicit operator SerializableTimeSpan(TimeSpan d) => new SerializableTimeSpan( d );
+    }
 }
