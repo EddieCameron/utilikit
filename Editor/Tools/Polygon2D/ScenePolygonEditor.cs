@@ -13,6 +13,10 @@ using Random = UnityEngine.Random;
 using UnityEditor.EditorTools;
 using System.Linq;
 
+#if !UNITY_2020_2_OR_NEWER
+using ToolManager = UnityEditor.EditorTools;
+#endif
+
 namespace Utilikit {
     [CustomEditor( typeof( ScenePolygon ) )]
     [CanEditMultipleObjects]
@@ -58,14 +62,14 @@ namespace Utilikit {
             public override GUIContent toolbarIcon => new GUIContent( EditorGUIUtility.IconContent( "EditCollider" ).image, "Edit Polygon" );
 
             public void OnEnable() {
-                EditorTools.activeToolChanged += OnActiveToolChanged;
-                EditorTools.activeToolChanging += OnActiveToolChanging;
+                ToolManager.activeToolChanged += OnActiveToolChanged;
+                ToolManager.activeToolChanging += OnActiveToolChanging;
                 Selection.selectionChanged += OnSelectionChanged;
             }
 
             public void OnDisable() {
-                EditorTools.activeToolChanged -= OnActiveToolChanged;
-                EditorTools.activeToolChanging -= OnActiveToolChanging;
+                ToolManager.activeToolChanged -= OnActiveToolChanged;
+                ToolManager.activeToolChanging -= OnActiveToolChanging;
                 Selection.selectionChanged -= OnSelectionChanged;
             }
 
@@ -77,20 +81,20 @@ namespace Utilikit {
 
             void OnActiveToolChanged() {
                 var scenePolygon = target as ScenePolygon;
-                if ( EditorTools.IsActiveTool( this ) && IsAvailable() && scenePolygon )
+                if ( ToolManager.IsActiveTool( this ) && IsAvailable() && scenePolygon )
                     polyUtility.StartEditing( scenePolygon );
             }
 
             void OnSelectionChanged() {
-                if ( EditorTools.IsActiveTool( this ) )
+                if ( ToolManager.IsActiveTool( this ) )
                     polyUtility.StopEditing();
                 var scenePolygon = target as ScenePolygon;
-                if ( EditorTools.IsActiveTool( this ) && IsAvailable() && scenePolygon != null )
+                if ( ToolManager.IsActiveTool( this ) && IsAvailable() && scenePolygon != null )
                     polyUtility.StartEditing( scenePolygon );
             }
 
             void OnActiveToolChanging() {
-                if ( EditorTools.IsActiveTool( this ) )
+                if ( ToolManager.IsActiveTool( this ) )
                     polyUtility.StopEditing();
             }
 
