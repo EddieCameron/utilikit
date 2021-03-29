@@ -103,6 +103,21 @@ namespace Utilikit
             return currentHighest;
         }
 
+        /// <summary>
+        /// Find the element in the collection that returns the highest value when evaluated with the evaluateFunction
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <param name="evaluateFunction"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static bool ContainsAny<T>( this IEnumerable<T> collection, Predicate<T> matchPredicate ) {
+            foreach ( var item in collection ) {
+                if ( matchPredicate( item ) )
+                    return true;
+            }
+            return false;
+        }
+
 
         /// <summary>
         /// Inplace fisher-yates shuffle of a list
