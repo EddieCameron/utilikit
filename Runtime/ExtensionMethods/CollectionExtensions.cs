@@ -110,6 +110,27 @@ namespace Utilikit
         /// <param name="evaluateFunction"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
+        public static int FindBestMatchIndex<T>( this IList<T> collection, Func<T, float> evaluateFunction ) {
+            int currentHighestIdx = -1;
+            float currentHighestValue = float.MinValue;
+            for ( int i = 0; i < collection.Count; i++ ) {
+                T item = collection[i];
+                float itemEvaluatedValue = evaluateFunction( item );
+                if ( itemEvaluatedValue > currentHighestValue ) {
+                    currentHighestIdx = i;
+                    currentHighestValue = itemEvaluatedValue;
+                }
+            }
+            return currentHighestIdx;
+        }
+
+        /// <summary>
+        /// Find the element in the collection that returns the highest value when evaluated with the evaluateFunction
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <param name="evaluateFunction"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public static bool ContainsAny<T>( this IEnumerable<T> collection, Predicate<T> matchPredicate ) {
             foreach ( var item in collection ) {
                 if ( matchPredicate( item ) )
