@@ -28,7 +28,7 @@ namespace Utilikit
             return count - 1;
         }
 
-        public static int PickWeightedRandom( IList<int> weights ) {
+        public static int PickWeightedRandom( IList<float> weights ) {
             // get total weight
             int count = weights.Count;
             float total = 0;
