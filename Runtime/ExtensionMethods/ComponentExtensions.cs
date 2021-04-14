@@ -213,4 +213,17 @@ public static class ComponentExtensions {
         return component.gameObject.TryGetComponentInParentWithInterface<T>( out interfaceInstance );
     }
     #endregion
+
+    #region Graphic
+    /// <summary>
+    /// Set only the alpha channel on a UI graphic
+    /// </summary>
+    /// <param name="graphic"></param>
+    /// <param name="alpha"></param>
+    public static void SetAlpha( this Graphic graphic, float alpha ) {
+        var c = graphic.color;
+        c.a = alpha;
+        graphic.color = c;
+    }
+    #endregion
 }
