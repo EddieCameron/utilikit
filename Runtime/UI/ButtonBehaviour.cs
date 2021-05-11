@@ -19,11 +19,11 @@ namespace Utilikit {
             }
         }
 
-        void OnEnable() {
+        protected virtual void OnEnable() {
             Button.onClick.AddListener( OnButtonClicked );
         }
 
-        void OnDisable() {
+        protected virtual void OnDisable() {
             Button.onClick.RemoveListener( OnButtonClicked );
         }
 
