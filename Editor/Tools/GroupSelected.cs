@@ -19,12 +19,12 @@ namespace Utilikit {
     public static class GroupSelected {
         [MenuItem( "GameObject/Group Selected Objects %#G", isValidateFunction: true )]
         public static bool CreateGroupValidate() {
-            return Selection.GetTransforms( SelectionMode.Editable | SelectionMode.ExcludePrefab | SelectionMode.OnlyUserModifiable | SelectionMode.TopLevel ).Length > 0;
+            return Selection.GetTransforms( SelectionMode.Editable | SelectionMode.ExcludePrefab | SelectionMode.TopLevel ).Length > 0;
         }
 
         [MenuItem( "GameObject/Group Selected Objects %#G")]
         public static void CreateGroup() {
-            var transforms = Selection.GetTransforms( SelectionMode.Editable | SelectionMode.ExcludePrefab | SelectionMode.OnlyUserModifiable | SelectionMode.TopLevel );
+            var transforms = Selection.GetTransforms( SelectionMode.Editable | SelectionMode.ExcludePrefab | SelectionMode.TopLevel );
             if ( transforms.Length == 0 )
                 return;
             Vector3 avgPos = Vector3.zero;
