@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
+using Random = UnityEngine.Random;
 
 namespace Utilikit {
     public static class MathUtils {
@@ -204,11 +206,11 @@ namespace Utilikit {
         }
 
 
-            /// <summary>
-            /// What is the shortest distance from a point on the given line to pTest
-            /// </summary>
-            /// <returns></returns>
-            public static float DistanceFromPointToLine( Vector2 p0, Vector2 p1, Vector2 pTest ) {
+        /// <summary>
+        /// What is the shortest distance from a point on the given line to pTest
+        /// </summary>
+        /// <returns></returns>
+        public static float DistanceFromPointToLine( Vector2 p0, Vector2 p1, Vector2 pTest ) {
             // https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
             // Return minimum distance between line segment vw and point p
             float l2 = ( p1 - p0 ).sqrMagnitude;  // i.e. |w-v|^2 -  avoid a sqrt
@@ -221,6 +223,25 @@ namespace Utilikit {
             float t = Mathf.Max( 0, Mathf.Min( 1, Vector2.Dot( pTest - p0, p1 - p0 ) / l2 ) );
             Vector2 projection = p0 + t * ( p1 - p0 );  // Projection falls on the segment
             return ( pTest - projection ).magnitude;
+        }
+
+        /// <summary>
+        /// What is the shortest distance from a point on the given line to pTest
+        /// </summary>
+        /// <returns></returns>
+        public static float DistanceFromPointToLine( IList<Vector2> points, Vector2 pTest ) {
+            if ( points.Count == 0 )
+                throw new ArgumentOutOfRangeException( "Need at least one point in line to find distance from" );
+
+            if ( points.Count == 1 )
+                return ( pTest - points[0] ).magnitude;
+
+            float closestDist = float.MaxValue;
+            for ( int i = 1; i < points.Count; i++ ) {
+                float segmentDist = DistanceFromPointToLine( points[i - 1], points[i], pTest );
+                closestDist = Mathf.Min( closestDist, segmentDist );
+            }
+            return closestDist;
         }
 
 
