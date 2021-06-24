@@ -113,19 +113,8 @@ namespace Utilikit {
             }
         }
 
-        public void RestoreFromRecord( Record record ) {
+        public void Empty() {
             _inventoryQuantities.Clear();
-            foreach ( var item in record.inventoryContents ) {
-                _inventoryQuantities[item.itemId] = item.quantity;
-            }
-        }
-
-        public Record GetRecord() {
-            return new Record( _inventoryQuantities );
-        }
-
-        public void FillRecord( Record record ) {
-            record.SetInventory( _inventoryQuantities );
         }
 
         [Serializable]
@@ -136,25 +125,6 @@ namespace Utilikit {
             public Quantity( string itemId, int quantity ) {
                 this.itemId = itemId;
                 this.quantity = quantity;
-            }
-        }
-
-        [Serializable]
-        public class Record {
-            public List<Quantity> inventoryContents = new List<Quantity>();
-
-            public Record( IDictionary<string, int> inventoryDict ) {
-                SetInventory( inventoryDict );
-            }
-            public Record( IEnumerable<Quantity> quantities ) {
-                inventoryContents.AddRange( quantities );
-            }
-
-            public void SetInventory( IDictionary<string, int> inventoryDict ) {
-                inventoryContents.Clear();
-                foreach ( var item in inventoryDict ) {
-                    inventoryContents.Add( new Quantity( item.Key, item.Value ) );
-                }
             }
         }
     }
