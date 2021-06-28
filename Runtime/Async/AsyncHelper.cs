@@ -72,6 +72,9 @@ namespace Utilikit {
             }
         }
 
+        void IUnityLifecycleListener.OnApplicationPause( bool isPaused ) {
+        }
+
         public class DelayedJob {
             public float ExecuteInSeconds { get; set; }
             public Action Job { get; set; }
@@ -182,6 +185,9 @@ namespace Utilikit {
 
         void IUnityLifecycleListener.OnApplicationQuit() {
             Stop();
+        }
+
+        void IUnityLifecycleListener.OnApplicationPause( bool isPaused ) {
         }
     }
 }

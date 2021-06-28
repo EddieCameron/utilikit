@@ -30,6 +30,8 @@ namespace Utilikit {
             if ( !UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode ) {
                 UnityEditor.EditorApplication.update -= OnEditorUpdate;
                 UnityEditor.EditorApplication.update += OnEditorUpdate;
+                UnityEditor.EditorApplication.pauseStateChanged -= HandleEditorPauseStateChange;
+                UnityEditor.EditorApplication.pauseStateChanged += HandleEditorPauseStateChange;
                 UnityEditor.EditorApplication.quitting -= HandleOnApplicationQuit;
                 UnityEditor.EditorApplication.quitting += HandleOnApplicationQuit;
             }
@@ -57,6 +59,25 @@ namespace Utilikit {
             }
         }
 
+        static void HandleOnApplicationPause( bool isPaused ) {
+            _listenerCache.Clear();
+            _listenerCache.AddRange( _listeners );
+            foreach ( var listener in _listenerCache ) {
+                try {
+                    listener?.OnApplicationPause( isPaused );
+                }
+                catch ( Exception e ) {
+                    Debug.LogException( e );
+                }
+            }
+        }
+
+#if UNITY_EDITOR
+        static void HandleEditorPauseStateChange( UnityEditor.PauseState pauseState ) {
+            HandleOnApplicationPause( pauseState == UnityEditor.PauseState.Paused );
+        }
+#endif
+
         static void HandleOnApplicationQuit() {
             _listenerCache.Clear();
             _listenerCache.AddRange( _listeners );
@@ -78,6 +99,10 @@ namespace Utilikit {
             HandleOnApplicationQuit();
         }
 
+        void OnApplicationPause( bool isPaused ) {
+            HandleOnApplicationPause( isPaused );
+        }
+
 #if UNITY_EDITOR
         static void OnEditorUpdate() {
             if ( UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode ) {
@@ -90,6 +115,8 @@ namespace Utilikit {
 
     public interface IUnityLifecycleListener {
         void Update();
+
+        void OnApplicationPause( bool isPaused );
 
         void OnApplicationQuit();
     }
