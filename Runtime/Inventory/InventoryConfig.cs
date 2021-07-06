@@ -1,6 +1,6 @@
 using Utilikit;
 using UnityEngine;
 
-public class InventoryConfig : StaticScriptableObject<InventoryConfig> {
+public class InventoryConfig : StaticScriptableObjectAddressable<InventoryConfig> {
     public Inventory.Quantity[] initialQuantities;
 }

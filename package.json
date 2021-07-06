@@ -10,5 +10,8 @@
       "name": "Eddie Cameron",
       "email": "eddie@eddiecameron.fun",
       "url": "https://eddiecameron.fun"
+    },
+    "dependencies": {
+      "com.unity.addressables": "1.17.17"
     }
   }
