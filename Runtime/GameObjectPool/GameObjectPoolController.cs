@@ -28,7 +28,7 @@ namespace Utilikit
             }
         }
 
-        const string _DEFAULT_POOL_GROUP_KEY = "defaultPoolGroup";
+        public const string DEFAULT_POOL_GROUP_KEY = "defaultPoolGroup";
         const int _DEFAULT_INITIAL_POOL_SIZE = 1;
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace Utilikit
         /// <param name="objectKey"></param>
         /// <param name="poolGroupKey"></param>
         /// <returns></returns>
-        public static bool HavePoolForObjectKey( string objectKey, string poolGroupKey = _DEFAULT_POOL_GROUP_KEY ) {
+        public static bool HavePoolForObjectKey( string objectKey, string poolGroupKey = DEFAULT_POOL_GROUP_KEY ) {
             return _poolGroups.TryGetValue( poolGroupKey, out GameObjectPoolGroup group ) && group.HavePoolForObjectKey( objectKey );
         }
 
@@ -47,7 +47,7 @@ namespace Utilikit
         /// <param name="objectKey"></param>
         /// <param name="poolGroupKey"></param>
         /// <returns></returns>
-        public static GameObjectPool GetPoolForObjectKey( string objectKey, string poolGroupKey = _DEFAULT_POOL_GROUP_KEY ) {
+        public static GameObjectPool GetPoolForObjectKey( string objectKey, string poolGroupKey = DEFAULT_POOL_GROUP_KEY ) {
             if ( !_poolGroups.TryGetValue( poolGroupKey, out GameObjectPoolGroup group ) ) {
                 Debug.LogWarning( "No pool group with key: " + poolGroupKey );
                 return null;
@@ -70,18 +70,18 @@ namespace Utilikit
         /// <param name="poolGroupKey"></param>
         /// <param name="initialPoolSize"></param>
         /// <returns></returns>
-        public static GameObjectPool GetOrCreatePoolForObject( GameObject sourceObject, string overrideObjectKey = "", string poolGroupKey = _DEFAULT_POOL_GROUP_KEY, int initialPoolSize = _DEFAULT_INITIAL_POOL_SIZE ) {
+        public static GameObjectPool GetOrCreatePoolForObject( GameObject sourceObject, string overrideObjectKey = "", string poolGroupKey = DEFAULT_POOL_GROUP_KEY, int initialPoolSize = _DEFAULT_INITIAL_POOL_SIZE ) {
             GameObjectPoolGroup group = GetOrCreateGroup( poolGroupKey );
 
             return group.GetOrCreatePoolForObject( sourceObject, overrideObjectKey, initialPoolSize );
         }
 
-        public static void DespawnAllPoolsInGroup( string poolGroupKey = _DEFAULT_POOL_GROUP_KEY ) {
+        public static void DespawnAllPoolsInGroup( string poolGroupKey = DEFAULT_POOL_GROUP_KEY ) {
             if ( _poolGroups.TryGetValue( poolGroupKey, out GameObjectPoolGroup group ) )
                 group.DespawnAllPools();
         }
 
-        public static void DestroyAllPoolsInGroup( string poolGroupKey = _DEFAULT_POOL_GROUP_KEY ) {
+        public static void DestroyAllPoolsInGroup( string poolGroupKey = DEFAULT_POOL_GROUP_KEY ) {
             if ( _poolGroups.TryGetValue( poolGroupKey, out GameObjectPoolGroup group ) )
                 group.DestroyAllPools();
         }
