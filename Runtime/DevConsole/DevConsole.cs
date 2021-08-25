@@ -23,6 +23,7 @@ namespace Utilikit {
         public DevConsoleButton devConsoleButtonPrefab;
         public DevConsoleToggle devConsoleTogglePrefab;
         public DevConsoleIntField devConsoleIntField;
+        public DevConsoleTextField devConsoleTextField;
         public DevConsoleSlider devConsoleSliderPrefab;
 
         private int currentScreen;
@@ -75,6 +76,12 @@ namespace Utilikit {
             var intFieldProps = GetPropertiesWithAttribute<DevConsoleIntFieldAttribute>( staticProps );
             foreach ( var intFieldAttr in intFieldProps ) {
                 var intField = CreateDevConsoleItem( devConsoleIntField, intFieldAttr.attribute, intFieldAttr.property );
+            }
+
+            // populate text fields
+            var textFieldProps = GetPropertiesWithAttribute<DevConsoleTextFieldAttribute>( staticProps );
+            foreach ( var textFieldAttr in textFieldProps ) {
+                var textField = CreateDevConsoleItem( devConsoleTextField, textFieldAttr.attribute, textFieldAttr.property );
             }
 
             // populate sliders
