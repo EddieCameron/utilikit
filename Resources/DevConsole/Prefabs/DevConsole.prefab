@@ -60,6 +60,8 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 0, g: 0, b: 0, a: 0.78431374}
   m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -157,6 +159,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
+  m_PresetInfoIsWorld: 0
 --- !u!114 &5477005398835224967
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -186,18 +189,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 671e86ef21b274be08edc39f1fcca59d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  devConsoleScreenPrefab: {fileID: 2213463114068707352, guid: 1e382a608aacc4f6982da506d244821f,
-    type: 3}
-  devConsoleScreenButtonPrefab: {fileID: 3085578666858924657, guid: 8eb83a5886efc4db3baef8de10066712,
-    type: 3}
-  devConsoleButtonPrefab: {fileID: 2427087856073346320, guid: d3cc367a3baba43b6bdb3fdca2526932,
-    type: 3}
-  devConsoleTogglePrefab: {fileID: 232921228348862857, guid: db2db14850aec4d85a8c6d056c707e34,
-    type: 3}
-  devConsoleIntField: {fileID: 3346751121623534719, guid: 70c6ae3bdac654a94b304ccfee8b291c,
-    type: 3}
-  devConsoleSliderPrefab: {fileID: 5447277585920954230, guid: 02a691d6a02ed46cabbea1c3fbf555e5,
-    type: 3}
+  devConsoleScreenPrefab: {fileID: 2213463114068707352, guid: 1e382a608aacc4f6982da506d244821f, type: 3}
+  devConsoleScreenButtonPrefab: {fileID: 3085578666858924657, guid: 8eb83a5886efc4db3baef8de10066712, type: 3}
+  devConsoleButtonPrefab: {fileID: 2427087856073346320, guid: d3cc367a3baba43b6bdb3fdca2526932, type: 3}
+  devConsoleTogglePrefab: {fileID: 232921228348862857, guid: db2db14850aec4d85a8c6d056c707e34, type: 3}
+  devConsoleIntField: {fileID: 3346751121623534719, guid: 70c6ae3bdac654a94b304ccfee8b291c, type: 3}
+  devConsoleTextField: {fileID: 3217451636798488149, guid: 900cc8f8233ca4214bbc227dd7446bc7, type: 3}
+  devConsoleSliderPrefab: {fileID: 5447277585920954230, guid: 02a691d6a02ed46cabbea1c3fbf555e5, type: 3}
 --- !u!1 &7945214887513783696
 GameObject:
   m_ObjectHideFlags: 0
@@ -259,3 +257,4 @@ MonoBehaviour:
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
