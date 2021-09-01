@@ -49,11 +49,11 @@ namespace Utilikit {
 
             Value = centre + Mathf.Sin( angle ) * amp;
 
+            if ( addLocalPositionOffsetFromStart )
+                Value += startPos[(int)axis];
+
             Vector3 pos = transform.localPosition;
             pos[(int)axis] = Value;
-            if ( addLocalPositionOffsetFromStart ) {
-                pos += startPos;
-            }
             transform.localPosition = pos;
         }
     }
