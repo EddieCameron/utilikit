@@ -66,27 +66,32 @@ namespace Utilikit {
             }
             else {
                 // Pick a random active sample
-                int i = (int)Random.value * activeSamples.Count;
-                Vector2 sample = activeSamples[i];
+                while ( activeSamples.Count > 0 ) {
+                    int i = (int) Random.value * activeSamples.Count;
+                    Vector2 sample = activeSamples[i];
 
-                // Try `k` random candidates between [radius, 2 * radius] from that sample.
-                for ( int j = 0; j < k; ++j ) {
+                    // Try `k` random candidates between [radius, 2 * radius] from that sample.
+                    for ( int j = 0; j < k; ++j ) {
 
-                    float angle = 2 * Mathf.PI * Random.value;
-                    float r = Mathf.Sqrt( 2 * Random.value / a + minRadius2 ); // See: http://stackoverflow.com/questions/9048095/create-random-number-within-an-annulus/9048443#9048443
-                    Vector2 candidate = sample + r * new Vector2( Mathf.Cos( angle ), Mathf.Sin( angle ) );
+                        float angle = 2 * Mathf.PI * Random.value;
+                        float
+                            r = Mathf.Sqrt( 2 * Random.value / a +
+                                            minRadius2 ); // See: http://stackoverflow.com/questions/9048095/create-random-number-within-an-annulus/9048443#9048443
+                        Vector2 candidate = sample + r * new Vector2( Mathf.Cos( angle ), Mathf.Sin( angle ) );
 
-                    // Accept candidates if it's inside the rect and farther than 2 * radius to any existing sample.
-                    if ( rect.Contains( candidate ) && IsFarEnough( candidate ) &&
-                        ( filter == null || filter( candidate ) ) ) {
-                        AddSample( candidate );
-                        return candidate;
+                        // Accept candidates if it's inside the rect and farther than 2 * radius to any existing sample.
+                        if ( rect.Contains( candidate ) && IsFarEnough( candidate ) &&
+                             ( filter == null || filter( candidate ) ) ) {
+                            AddSample( candidate );
+                            return candidate;
+                        }
                     }
-                }
 
-                // If we couldn't find a valid candidate after k attempts, remove this sample from the active samples queue
-                activeSamples[i] = activeSamples[activeSamples.Count - 1];
-                activeSamples.RemoveAt( activeSamples.Count - 1 );
+                    // If we couldn't find a valid candidate after k attempts, remove this sample from the active samples queue
+                    activeSamples[i] = activeSamples[activeSamples.Count - 1];
+                    activeSamples.RemoveAt( activeSamples.Count - 1 );
+                }
+                    
                 return null;
             }
         }
