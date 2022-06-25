@@ -21,8 +21,6 @@ namespace Utilikit {
         private int m_SelectedVertex = -1;
         private int m_SelectedEdgeVertex0 = -1;
         private int m_SelectedEdgeVertex1 = -1;
-        private bool m_LeftIntersect = false;
-        private bool m_RightIntersect = false;
         private bool m_DeleteMode = false;
 
         private bool m_FirstOnSceneGUIAfterReset;
@@ -37,8 +35,6 @@ namespace Utilikit {
             m_SelectedVertex = -1;
             m_SelectedEdgeVertex0 = -1;
             m_SelectedEdgeVertex1 = -1;
-            m_LeftIntersect = false;
-            m_RightIntersect = false;
             m_FirstOnSceneGUIAfterReset = true;
             m_HandlePoint = false;
             m_HandleEdge = false;
@@ -49,7 +45,7 @@ namespace Utilikit {
             StopEditing();
             StartEditing( scenePoly );
         }
-        
+
         public void StartEditing( ScenePolygon scenePolygon ) {
             Polygon2D editingPoly;
             if ( scenePolygon?.Polygon == null )
@@ -109,8 +105,6 @@ namespace Utilikit {
                     evt.Use();
             }
             else if ( evt.type == EventType.MouseUp ) {
-                m_LeftIntersect = false;
-                m_RightIntersect = false;
             }
 
             // Do we handle point or line?
