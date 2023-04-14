@@ -7,7 +7,6 @@ using Utilikit;
 using Random = UnityEngine.Random;
 
 namespace Utilikit {
-    [RequireComponent( typeof( Collider2D ))]
     public class Trigger2D : MonoBehaviour {
         [Tooltip( "Objects on these layers will activate the trigger" )]
         public LayerMask layerMask;
